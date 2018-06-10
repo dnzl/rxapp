@@ -1,0 +1,141 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+        <link rel="stylesheet" href="css/normalize.min.css">
+
+        <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+        <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+
+        <link rel="stylesheet" href="css/main.css">
+
+    </head>
+    <body ng-app="rxModule">
+        <!--[if lt IE 8]>
+            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <div id="app" ng-controller="BaseCtrl">
+
+            <div class="header-container">
+                <header class="wrapper clearfix">
+                    <h1 class="title">Rx</h1>
+                    <nav>
+                        <b-button size="lg" variant="secondary">
+                            Select files
+                        </b-button>
+                        <input id="input-file" type="file" multiple>
+                        <button id="save-button">Save on server/show link&amp;pass</button>
+<!--                        <button onclick="decryptFiles();">decrypt</button>-->
+                    </nav>
+                </header>
+            </div>
+
+            <div id="viewer" class="main-container" ng-controller="ViewerCtrl">
+                <div class="main wrapper clearfix">
+
+                    <section id="viewer">
+                        <article id="main-img">
+
+<div id="dwv">
+    <div class="layerContainer">
+        <canvas class="imageLayer"></canvas>
+    </div>
+</div>
+
+                        </article>
+
+                        <aside id="app-column">
+                            <ul>
+                                <li><img style="width:100px;height:100px;background:#ccc;"></li>
+                                <li><img style="width:100px;height:100px;background:#ccc;"></li>
+                                <li><img style="width:100px;height:100px;background:#ccc;"></li>
+                                <li><img style="width:100px;height:100px;background:#ccc;"></li>
+                                <li><img style="width:100px;height:100px;background:#ccc;"></li>
+                            </ul>
+                        </aside>
+
+                    </section>
+
+                </div> <!-- #main -->
+            </div> <!-- #main-container -->
+
+            <div class="footer-container">
+                <footer class="wrapper">
+                    <h3>footer</h3>
+                </footer>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="modal-insert-keys" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Enter keys</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="form-passworts" name="form-passworts">
+                            <div class="modal-body">
+
+                                <div class="form-group">
+                                    <input type="password" class="form-control input-passwort" name="wort[0]" autocomplete="off"><br>
+                                    <input type="password" class="form-control input-passwort" name="wort[1]" autocomplete="off"><br>
+                                    <input type="password" class="form-control input-passwort" name="wort[2]" autocomplete="off"><br>
+                                    <input type="password" class="form-control input-passwort" name="wort[3]" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button id="see-files" type="button" class="btn btn-primary">See Files</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+        </div><!-- /#app -->
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.10/angular.min.js"></script>
+        <script src="https://code.angularjs.org/1.6.10/angular-animate.min.js"></script>
+        <script src="https://code.angularjs.org/1.6.10/angular-touch.min.js"></script>
+        <script type="text/javascript" src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js"></script>
+<!--        <script type="text/javascript" src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+<!--
+
+<script type="text/javascript" src="node_modules/dwv/node_modules/i18next/i18next.min.js"></script>
+<script type="text/javascript" src="node_modules/dwv/node_modules/i18next-xhr-backend/i18nextXHRBackend.min.js"></script>
+<script type="text/javascript" src="node_modules/dwv/node_modules/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
+<script type="text/javascript" src="node_modules/dwv/node_modules/jszip/dist/jszip.min.js"></script>
+<!-- decoders --
+<script type="text/javascript" src="node_modules/dwv/decoders/pdfjs/jpx.js"></script>
+<script type="text/javascript" src="node_modules/dwv/decoders/pdfjs/util.js"></script>
+<script type="text/javascript" src="node_modules/dwv/decoders/pdfjs/arithmetic_decoder.js"></script>
+<script type="text/javascript" src="node_modules/dwv/decoders/pdfjs/jpg.js"></script>
+<script type="text/javascript" src="node_modules/dwv/decoders/rii-mango/lossless-min.js"></script>
+-->
+
+
+        <script type="text/javascript" src="node_modules/dwv/node_modules/konva/konva.min.js"></script>
+        <script type="text/javascript" src="node_modules/dwv/decoders/rii-mango/lossless-min.js"></script>
+        <!-- dwv -->
+        <script type="text/javascript" src="node_modules/dwv/dist/dwv.js"></script>
+
+        <!-- encryption -->
+<!--        <script type="text/javascript" src="node_modules/xkcd-password/index.js"></script>-->
+        <script src="js/triplesec-3.0.14-min.js"></script>
+        <script src="js/app/app.js"></script>
+    </body>
+</html>
