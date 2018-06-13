@@ -6,16 +6,14 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title></title>
+        <title>Rx</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
-        <link rel="stylesheet" href="css/normalize.min.css">
 
-        <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
-        <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
-
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
         <link rel="stylesheet" href="css/main.css">
 
     </head>
@@ -30,12 +28,33 @@
                 <header class="wrapper clearfix">
                     <h1 class="title">Rx</h1>
                     <nav>
-                        <b-button size="lg" variant="secondary">
-                            Select files
-                        </b-button>
-                        <input id="input-file" type="file" multiple>
-                        <button id="save-button">Save on server/show link&amp;pass</button>
-<!--                        <button onclick="decryptFiles();">decrypt</button>-->
+                        <button onclick="document.getElementById('input-file').click()"
+                                class="btn btn-secondary"
+                                ng-show="WebApp.showFileinput">
+                            <i class="fas fa-upload"></i> Select files
+                        </button>
+                        <div ng-show="WebApp.showFileinputLoader">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+
+                        <input id="input-file" type="file" multiple class="hidden"
+                               ng-file-uploader
+                               ng-change="WebApp.selectFiles(this.files)"
+                               ng-model="sFiles"
+                               ng-disabled="WebApp.disableFileinput"
+                               fileread="WebApp.selectedFiles">
+
+                        <button id="save-button" class="btn btn-primary"
+                                ng-show="WebApp.showSaveBtn"
+                                ng-click="WebApp.saveFiles()">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+
+                        <button id="save-button" class="btn btn-info"
+                                ng-show="WebApp.showSeeKeysBtn"
+                                ng-click="WebApp.showSeeKeysModal()">
+                            <i class="fas fa-eye"></i> See Keys
+                        </button>
                     </nav>
                 </header>
             </div>
@@ -46,20 +65,16 @@
                     <section id="viewer">
                         <article id="main-img">
 
-<div id="dwv">
-    <div class="layerContainer">
-        <canvas class="imageLayer"></canvas>
-    </div>
-</div>
+                            <div id="dwv">
+                                <div class="layerContainer">
+                                    <canvas class="imageLayer"></canvas>
+                                </div>
+                            </div>
 
                         </article>
 
-                        <aside id="app-column">
+                        <aside id="app-column" ng-show="ViewerApp.showColumn">
                             <ul>
-                                <li><img style="width:100px;height:100px;background:#ccc;"></li>
-                                <li><img style="width:100px;height:100px;background:#ccc;"></li>
-                                <li><img style="width:100px;height:100px;background:#ccc;"></li>
-                                <li><img style="width:100px;height:100px;background:#ccc;"></li>
                                 <li><img style="width:100px;height:100px;background:#ccc;"></li>
                             </ul>
                         </aside>
@@ -70,39 +85,62 @@
             </div> <!-- #main-container -->
 
             <div class="footer-container">
+
                 <footer class="wrapper">
                     <h3>footer</h3>
                 </footer>
             </div>
 
             <!-- Modal -->
-            <div class="modal fade" id="modal-insert-keys" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Enter keys</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form id="form-passworts" name="form-passworts">
-                            <div class="modal-body">
-
-                                <div class="form-group">
-                                    <input type="password" class="form-control input-passwort" name="wort[0]" autocomplete="off"><br>
-                                    <input type="password" class="form-control input-passwort" name="wort[1]" autocomplete="off"><br>
-                                    <input type="password" class="form-control input-passwort" name="wort[2]" autocomplete="off"><br>
-                                    <input type="password" class="form-control input-passwort" name="wort[3]" autocomplete="off">
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button id="see-files" type="button" class="btn btn-primary">See Files</button>
-                            </div>
-                        </form>
-                    </div>
+            <script type="text/ng-template" id="ModalShowKeys.html">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modal-show-keys-title">Access to the files</h3>
                 </div>
-            </div>
+                    <div class="modal-body">
+                        <div>
+                            URL: {{WebApp.resourceUrl}}
+                        </div>
+
+                        <div class="form-group">
+                            <input type="text" class="form-control input-passwort" autocomplete="off" disabled="disabled"
+                                    ng-model="WebApp._keyWords[0]"><br>
+                            <input type="text" class="form-control input-passwort" autocomplete="off" disabled="disabled"
+                                    ng-model="WebApp._keyWords[1]"><br>
+                            <input type="text" class="form-control input-passwort" autocomplete="off" disabled="disabled"
+                                    ng-model="WebApp._keyWords[2]"><br>
+                            <input type="text" class="form-control input-passwort" autocomplete="off" disabled="disabled"
+                                    ng-model="WebApp._keyWords[3]">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" ng-click="$modalCtrl.close()">Close</button>
+                        <button type="button" class="btn btn-primary" ng-click="WebApp.showPrintable()">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+            </script><!-- /#modal-show-keys -->
+
+            <script type="text/ng-template" id="ModalInsertKeys.html">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modal-insert-keys-title">Insert Keys</h3>
+                </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="password" class="form-control input-passwort" autocomplete="off"
+                                    ng-model="WebApp._keyWords[0]"><br>
+                            <input type="password" class="form-control input-passwort" autocomplete="off"
+                                    ng-model="WebApp._keyWords[1]"><br>
+                            <input type="password" class="form-control input-passwort" autocomplete="off"
+                                    ng-model="WebApp._keyWords[2]"><br>
+                            <input type="password" class="form-control input-passwort" autocomplete="off"
+                                    ng-model="WebApp._keyWords[3]">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" ng-click="$modalCtrl.close()">Close</button>
+                        <button type="button" class="btn btn-primary" ng-click="WebApp.decryptFiles()">See Files</button>
+                    </div>
+            </script><!-- /#modal-insert-keys -->
 
 
         </div><!-- /#app -->
@@ -112,7 +150,7 @@
         <script src="https://code.angularjs.org/1.6.10/angular-animate.min.js"></script>
         <script src="https://code.angularjs.org/1.6.10/angular-touch.min.js"></script>
         <script type="text/javascript" src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js"></script>
-<!--        <script type="text/javascript" src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+        <script type="text/javascript" src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
 <!--
 
 <script type="text/javascript" src="node_modules/dwv/node_modules/i18next/i18next.min.js"></script>
@@ -136,6 +174,7 @@
         <!-- encryption -->
 <!--        <script type="text/javascript" src="node_modules/xkcd-password/index.js"></script>-->
         <script src="js/triplesec-3.0.14-min.js"></script>
+        <script src="js/viewer.js"></script>
         <script src="js/app/app.js"></script>
     </body>
 </html>
