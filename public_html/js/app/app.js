@@ -36,11 +36,20 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
 .factory('FileSrv',function(){
     var $this=this;
 
-    $this.saveFileToServer=function(encryptedFile){
+    $this.saveFile=function(encryptedFile){
 //        $http.... send file to server
 return new Promise(function(resolve,reject){
     resolve({
         id:'xxx',
+    });
+});
+    };
+    $this.getFile=function(id){
+//        $http.... send file to server
+return new Promise(function(resolve,reject){
+    resolve({
+        id:id,
+        files:false,
     });
 });
     };
@@ -91,8 +100,16 @@ return new Promise(function(resolve,reject){
         selectedFiles:false,
         encryptedFiles:false,
         idResource:false, //id server side to find files
+//ENCRYPTION
         _keyWords:[],
-        _key:false,
+        getKey:function(){
+            return WebApp._keyWords.join(' ');
+        },
+        generateKey:function(){
+            WebApp._keyWords=['aaa','bbb','ccc','ddd'];
+        },
+
+//MODALS
         openModal:function(tpl,ctrl){
             var ctrl = ctrl || 'ModalDefaultCtrl';
             $uibModal.open({
@@ -105,19 +122,16 @@ return new Promise(function(resolve,reject){
                 animation:false,
             });
         },
-        generateKey:function(){
-            WebApp._keyWords=['aaa','bbb','ccc','ddd'];
-            WebApp._key=WebApp._keyWords.join(' ');
-        },
-        resourceUrl:'',
-        generateUrl:function(){
-            return '#k='+WebApp.idResource;
-        },
         showInsertKeysModal:function(){
             WebApp.openModal('ModalInsertKeys.html');
         },
         showSeeKeysModal:function(){
             WebApp.openModal('ModalShowKeys.html');
+        },
+//FILE
+        resourceUrl:'',
+        generateUrl:function(){
+            return '#k='+WebApp.idResource;
         },
         handleFile:function(){
             WebApp.showFileinput=false;
@@ -125,7 +139,7 @@ return new Promise(function(resolve,reject){
             //show files in viewer
             WebApp.ViewerApp.loadURLs([WebApp.selectedFiles]);
             //encrypt file
-            FileSrv.encryptFile(WebApp.selectedFiles,WebApp._key).then(function(buff){
+            FileSrv.encryptFile(WebApp.selectedFiles,WebApp.getKey()).then(function(buff){
                 WebApp.encryptedFiles=buff;
                 WebApp.showFileinputLoader=false;
                 WebApp.showSaveBtn=true;
@@ -133,7 +147,7 @@ return new Promise(function(resolve,reject){
             });
         },
         saveFiles:function(){
-            FileSrv.saveFileToServer(WebApp.encryptedFiles).then(function(r){
+            FileSrv.saveFile(WebApp.encryptedFiles).then(function(r){
                 //show url/qr code & passworte
                 WebApp.idResource=r.id;
                 WebApp.resourceUrl=WebApp.generateUrl();
@@ -141,9 +155,29 @@ return new Promise(function(resolve,reject){
                 WebApp.showSeeKeysBtn=true;
                 WebApp.showSeeKeysModal();
             });
+        },
+        decryptFiles:function(){
+            FileSrv.decryptFile(WebApp.encryptedFiles,WebApp.getKey()).then(function(r){
+console.log('decrypted, show in viewer!!',r);
+            });
+        },
+        loadResource:function(id){
+            FileSrv.getFile(id).then(function(r){
+console.log(r);
+                WebApp.encryptedFiles=r.files;
+                WebApp.openModal('ModalInsertKeys.html');
 
+            },function(){
+//[TODO] handle nonextistent resource
+            });
         },
     };
+
+    var hash=window.location.hash.split('='); //url.com/#key=HASH
+    if(hash.length && hash[1]!==undefined && hash[1].length){
+        WebApp.showFileinput=false;
+        WebApp.loadResource(hash[1]);
+    }
 
     $rootScope.$watch('WebApp.selectedFiles',function(data){ //selected files, begin encrypt
         if(data){WebApp.handleFile(data);}
@@ -164,22 +198,22 @@ return new Promise(function(resolve,reject){
   $ctrl.close = function(){$uibModalInstance.close();};
 })
 
-.directive('ngFileUploader', [function () {
-    return {
-        scope: {
-            fileread: "="
+.directive('ngFileUploader', [function(){
+    return{
+        scope:{
+            fileread:"="
         },
-        link: function (scope, element, attributes){
+        link:function(scope, element, attributes){
             element.bind("change", function(changeEvent){
-                var reader = new FileReader();
-                reader.onload = function(loadEvent){
+                var reader=new FileReader();
+                reader.onload=function(loadEvent){
                     scope.$apply(function(){
-                        scope.fileread = loadEvent.target.result;
+                        scope.fileread=loadEvent.target.result;
                     });
                 }
                 reader.readAsDataURL(changeEvent.target.files[0]);
             });
         }
-    }
+    };
 }]);
 ;
