@@ -20,7 +20,7 @@ var SiteCtrl=function(){
 
 
 $(document).ready(function(){
-    new SiteApp=new SiteCtrl();
+    var SiteApp=new SiteCtrl();
     App.init();
 
     var hash=window.location.hash.split('='); //url.com/#key=HASH
