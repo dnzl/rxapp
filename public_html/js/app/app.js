@@ -2,6 +2,10 @@
 if(!window.File || !window.FileReader || !window.FileList || !window.Blob){
     alert('The File APIs are not fully supported in this browser.');
 }
+Array.prototype.remove = Array.prototype.remove || function(val){
+    var i = this.length;
+    while(i--){if(this[i]===val){this.splice(i,1);}}
+};
 
 var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
 
@@ -33,65 +37,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
     }
 }])
 
-.factory('FileSrv',function($http){
-    var $this=this;
-
-    $this.saveFile=function(encryptedFile){
-      return $http.post('backend.php',{files:encryptedFile});
-    };
-    $this.getFile=function(id){
-      return $http.get('backend.php?id='+id);
-    };
-
-    //reads the uploaded files, returns a promise.all resolve all the files as array of dataurls
-    $this.readUploadedFiles=function(fileList){
-      var Promises=[];
-      angular.forEach(fileList,function(file,i){
-        Promises.push(new Promise(function(resolve){
-          var reader=new FileReader();
-          reader.onload=function(loadEvent){resolve(loadEvent.target.result);};
-          reader.readAsDataURL(file);
-        }));
-      });
-      return Promise.all(Promises);
-    };
-
-    $this.encryptFile=function(file,key){
-        return new Promise(function(resolve,reject){
-            triplesec.encrypt({
-                data:new triplesec.Buffer(file),
-                key:new triplesec.Buffer(key),
-                progress_hook:function(obj){}
-            },function(err,buff){
-                if(!err){
-                    resolve(buff.toString('hex'));
-                }else{
-                    reject(err);
-                }
-            });
-        });
-    };
-
-    $this.decryptFile=function(file,key){
-        return new Promise(function(resolve,reject){
-            triplesec.decrypt({
-                data:new triplesec.Buffer(file,'hex'),
-                key:new triplesec.Buffer(key),
-                progress_hook:function(obj){}
-            },function(err,buff){
-                if(!err){
-                    resolve(buff.toString());
-                }else{
-                    reject(err);
-                }
-            });
-        });
-    };
-
-    return $this;
-})
-
-.controller('BaseCtrl',function($rootScope,FileSrv,$uibModal){
+.controller('BaseCtrl',function($rootScope,FileSrv,EncryptSrv,$uibModal,$timeout){
     var WebApp={
         ViewerApp:new ViewerApp(),
         showSaveBtn:false,
@@ -137,32 +83,47 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
             WebApp.resourceUrl='#k='+WebApp.idResource;
             WebApp.fullUrl=window.location.href+WebApp.resourceUrl;
         },
-        encryptSelectedFiles:function(i,arrEncryptedFiles){
-          return new Promise(function(resolve,reject){
-            FileSrv.encryptFile(WebApp.selectedFiles[i],WebApp.getKey()).then(function(encryptedFile){
-              arrEncryptedFiles[i]=encryptedFile;
-              if(WebApp.selectedFiles[i+1]!==undefined){
-                resolve(WebApp.encryptSelectedFiles(i+1,arrEncryptedFiles));
-              }else{
-                resolve(arrEncryptedFiles);
-              }
-            });
-          });
+getTimeDiff:function(start,now){return (now-start);},
+        encryptSelectedFiles:function(){
+//cant use while encrypt; ~20 secs
+var a=new Date();
+EncryptSrv.syncEncryptArrFiles(WebApp.selectedFiles,WebApp.getKey()).then(function(){
+  console.log('syncEncryptArrFiles',WebApp.getTimeDiff(a,new Date()));
+});
+
+var b=new Date();
+EncryptSrv.asyncEncryptArrFiles(WebApp.selectedFiles,WebApp.getKey()).then(function(){
+  console.log('asyncEncryptArrFiles',WebApp.getTimeDiff(b,new Date()));
+});
+return EncryptSrv.asyncEncryptArrFiles(WebApp.selectedFiles,WebApp.getKey());
+
+        },
+        decryptFiles:function(){
+          EncryptSrv.decryptArrFiles(WebApp.encryptedFiles,WebApp.getKey());
+//           var Promises=[];
+//           angular.forEach(WebApp.encryptedFiles,function(file){
+//             Promises.push(FileSrv.decryptFile(file,WebApp.getKey()));
+//           });
+//           Promise.all(Promises).then(function(files){
+// console.log('all promises',files);
+// WebApp.ViewerApp.loadURLs(files);
+//           });
         },
         handleFiles:function(){
             WebApp.showFileinput=false;
             WebApp.showFileinputLoader=true;
             //show files in viewer
             WebApp.ViewerApp.loadURLs(WebApp.selectedFiles);
-
-
-            var arrEncryptedFiles=[];
-            WebApp.encryptSelectedFiles(0,arrEncryptedFiles).then(function(encryptedFiles){
-              WebApp.encryptedFiles=encryptedFiles;
-              WebApp.showFileinputLoader=false;
-              WebApp.showSaveBtn=true;
-              $rootScope.$digest();
-            });
+$timeout(function(){
+  var time=new Date();
+  WebApp.encryptSelectedFiles().then(function(encryptedFiles){
+console.log('encryptedFiles',WebApp.getTimeDiff(time,new Date()),encryptedFiles);
+    WebApp.encryptedFiles=encryptedFiles;
+    WebApp.showFileinputLoader=false;
+    WebApp.showSaveBtn=true;
+    $rootScope.$digest();
+  });
+},1000);
 return;
 
             //encrypt files
@@ -182,52 +143,6 @@ return;
                 WebApp.showSaveBtn=false;
                 WebApp.showSeeKeysBtn=true;
                 WebApp.showSeeKeysModal();
-            });
-        },
-
-        decryptArrFiles:function(i,arrDecryptedFiles){
-console.log('WebApp.decryptArrFiles',i,arrDecryptedFiles);
-          return new Promise(function(resolve,reject){
-            FileSrv.decryptFile(WebApp.encryptedFiles[i],WebApp.getKey()).then(function(decryptedFile){
-console.log('FileSrv.decryptFile.then',decryptedFile);
-              arrDecryptedFiles[i]=decryptedFile;
-              if(WebApp.encryptedFiles[i+1]!==undefined){
-                resolve(WebApp.decryptArrFiles(i+1,arrDecryptedFiles));
-              }else{
-                resolve(arrDecryptedFiles);
-              }
-            });
-          });
-        },
-        decryptFiles:function(){
-          var Promises=[];
-          angular.forEach(WebApp.encryptedFiles,function(file,i){
-            Promises.push(FileSrv.decryptFile(WebApp.encryptedFiles[i],WebApp.getKey()));
-          });
-          Promise.all(Promises).then(function(files){
-console.log('all promises',files);
-WebApp.ViewerApp.loadURLs(files);
-          });
-return;
-
-
-
-
-
-
-
-console.log('WebApp.decryptFiles');
-          var arrDecryptedFiles;
-          WebApp.decryptArrFiles(0,arrDecryptedFiles).then(function(r){
-console.log('WebApp.decryptArrFiles.then',r,arrDecryptedFiles);
-return;
-            WebApp.ViewerApp.loadURLs(json.files);
-          });
-
-return;
-            FileSrv.decryptFile(WebApp.encryptedFiles,WebApp.getKey()).then(function(r){
-              var json=JSON.parse(r.toString());
-              WebApp.ViewerApp.loadURLs(json.files);
             });
         },
         loadResource:function(id){
