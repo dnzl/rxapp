@@ -80,7 +80,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
                 progress_hook:function(obj){}
             },function(err,buff){
                 if(!err){
-                    resolve(buff);
+                    resolve(buff.toString());
                 }else{
                     reject(err);
                 }
@@ -132,17 +132,41 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         },
 //FILE
         resourceUrl:'',
+        fullUrl:'',
         generateUrl:function(){
-            return '#k='+WebApp.idResource;
+            WebApp.resourceUrl='#k='+WebApp.idResource;
+            WebApp.fullUrl=window.location.href+WebApp.resourceUrl;
+        },
+        encryptSelectedFiles:function(i,arrEncryptedFiles){
+          return new Promise(function(resolve,reject){
+            FileSrv.encryptFile(WebApp.selectedFiles[i],WebApp.getKey()).then(function(encryptedFile){
+              arrEncryptedFiles[i]=encryptedFile;
+              if(WebApp.selectedFiles[i+1]!==undefined){
+                resolve(WebApp.encryptSelectedFiles(i+1,arrEncryptedFiles));
+              }else{
+                resolve(arrEncryptedFiles);
+              }
+            });
+          });
         },
         handleFiles:function(){
             WebApp.showFileinput=false;
             WebApp.showFileinputLoader=true;
             //show files in viewer
             WebApp.ViewerApp.loadURLs(WebApp.selectedFiles);
-            //encrypt file
+
+
+            var arrEncryptedFiles=[];
+            WebApp.encryptSelectedFiles(0,arrEncryptedFiles).then(function(encryptedFiles){
+              WebApp.encryptedFiles=encryptedFiles;
+              WebApp.showFileinputLoader=false;
+              WebApp.showSaveBtn=true;
+              $rootScope.$digest();
+            });
+return;
+
+            //encrypt files
             var filesText=JSON.stringify({files:WebApp.selectedFiles});
-console.log(filesText);
             FileSrv.encryptFile(filesText,WebApp.getKey()).then(function(encryptedFiles){
                 WebApp.encryptedFiles=encryptedFiles;
                 WebApp.showFileinputLoader=false;
@@ -151,29 +175,68 @@ console.log(filesText);
             });
         },
         saveFiles:function(){
-            FileSrv.saveFile(WebApp.encryptedFiles).then(function(r){
+            FileSrv.saveFile(JSON.stringify(WebApp.encryptedFiles)).then(function(r){
                 //show url/qr code & passworte
                 WebApp.idResource=r.data.id;
-                WebApp.resourceUrl=WebApp.generateUrl();
+                WebApp.generateUrl();
                 WebApp.showSaveBtn=false;
                 WebApp.showSeeKeysBtn=true;
                 WebApp.showSeeKeysModal();
             });
         },
+
+        decryptArrFiles:function(i,arrDecryptedFiles){
+console.log('WebApp.decryptArrFiles',i,arrDecryptedFiles);
+          return new Promise(function(resolve,reject){
+            FileSrv.decryptFile(WebApp.encryptedFiles[i],WebApp.getKey()).then(function(decryptedFile){
+console.log('FileSrv.decryptFile.then',decryptedFile);
+              arrDecryptedFiles[i]=decryptedFile;
+              if(WebApp.encryptedFiles[i+1]!==undefined){
+                resolve(WebApp.decryptArrFiles(i+1,arrDecryptedFiles));
+              }else{
+                resolve(arrDecryptedFiles);
+              }
+            });
+          });
+        },
         decryptFiles:function(){
+          var Promises=[];
+          angular.forEach(WebApp.encryptedFiles,function(file,i){
+            Promises.push(FileSrv.decryptFile(WebApp.encryptedFiles[i],WebApp.getKey()));
+          });
+          Promise.all(Promises).then(function(files){
+console.log('all promises',files);
+WebApp.ViewerApp.loadURLs(files);
+          });
+return;
+
+
+
+
+
+
+
+console.log('WebApp.decryptFiles');
+          var arrDecryptedFiles;
+          WebApp.decryptArrFiles(0,arrDecryptedFiles).then(function(r){
+console.log('WebApp.decryptArrFiles.then',r,arrDecryptedFiles);
+return;
+            WebApp.ViewerApp.loadURLs(json.files);
+          });
+
+return;
             FileSrv.decryptFile(WebApp.encryptedFiles,WebApp.getKey()).then(function(r){
               var json=JSON.parse(r.toString());
               WebApp.ViewerApp.loadURLs(json.files);
-console.log('done',json.files);
             });
         },
         loadResource:function(id){
             FileSrv.getFile(id).then(function(r){
-                WebApp.encryptedFiles=r.data.files;
+                WebApp.encryptedFiles=JSON.parse(r.data.files);
                 WebApp.openModal('ModalInsertKeys.html');
-            },function(){
-//[TODO] handle nonextistent resource
-console.log('error');
+            },function(r){
+              //[TODO] handle nonextistent resource
+              console.log('error',r);
             });
         },
     };
