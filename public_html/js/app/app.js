@@ -95,6 +95,10 @@ var b=new Date();
 EncryptSrv.asyncEncryptArrFiles(WebApp.selectedFiles,WebApp.getKey()).then(function(){
   console.log('asyncEncryptArrFiles',WebApp.getTimeDiff(b,new Date()));
 });
+
+
+
+
 return EncryptSrv.asyncEncryptArrFiles(WebApp.selectedFiles,WebApp.getKey());
 
         },
@@ -114,26 +118,18 @@ return EncryptSrv.asyncEncryptArrFiles(WebApp.selectedFiles,WebApp.getKey());
             WebApp.showFileinputLoader=true;
             //show files in viewer
             WebApp.ViewerApp.loadURLs(WebApp.selectedFiles);
-$timeout(function(){
-  var time=new Date();
-  WebApp.encryptSelectedFiles().then(function(encryptedFiles){
-console.log('encryptedFiles',WebApp.getTimeDiff(time,new Date()),encryptedFiles);
-    WebApp.encryptedFiles=encryptedFiles;
-    WebApp.showFileinputLoader=false;
-    WebApp.showSaveBtn=true;
-    $rootScope.$digest();
-  });
-},1000);
-return;
-
-            //encrypt files
-            var filesText=JSON.stringify({files:WebApp.selectedFiles});
-            FileSrv.encryptFile(filesText,WebApp.getKey()).then(function(encryptedFiles){
+            $timeout(function(){
+//var time=new Date();
+              WebApp.encryptSelectedFiles().then(function(encryptedFiles){
+//console.log('encryptedFiles',WebApp.getTimeDiff(time,new Date()),encryptedFiles);
                 WebApp.encryptedFiles=encryptedFiles;
                 WebApp.showFileinputLoader=false;
                 WebApp.showSaveBtn=true;
                 $rootScope.$digest();
-            });
+              },function(e){
+console.log('error',e);
+              });
+            },1000);
         },
         saveFiles:function(){
             FileSrv.saveFile(JSON.stringify(WebApp.encryptedFiles)).then(function(r){
