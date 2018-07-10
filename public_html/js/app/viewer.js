@@ -13,8 +13,8 @@ var ViewerApp=function(){
 
     $this.App=new dwv.App();
 
-    $this.loadURLs=function(urls){return $this.App.loadURLs(urls);};
-    $this.loadFiles=function(files){return $this.App.loadFiles(files);};
+    $this.loadURLs=function(urls){$this.App.loadURLs(urls);};
+    $this.loadFiles=function(files){$this.App.loadFiles(files);};
 
     $this.init=function(){
         // initialise with the id of the container div

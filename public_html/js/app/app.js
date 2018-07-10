@@ -2,13 +2,14 @@
 if(!window.File || !window.FileReader || !window.FileList || !window.Blob){
     alert('The File APIs are not fully supported in this browser.');
 }
+if (typeof(Worker)===undefined){alert('WebWorkers not found');}
+
 Array.prototype.remove = Array.prototype.remove || function(val){
-    var i = this.length;
-    while(i--){if(this[i]===val){this.splice(i,1);}}
+    var i = this.length; while(i--){if(this[i]===val){this.splice(i,1);}}
 };
 
 var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
-.controller('BaseCtrl',function($rootScope,FileSrv,EncryptSrv,$uibModal,$timeout){
+.controller('BaseCtrl',function($rootScope,FileSrv,EncryptSrv,$uibModal){
     var WebApp={
         ViewerApp:new ViewerApp(),
         showSaveBtn:false,
@@ -16,19 +17,14 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         showFileinput:true,
         showFileinputLoader:false,
         showSeeKeysBtn:false,
-        selectedFiles:{
-          url:[],
-          bin:[],
-        },
-        encryptedFiles:false,
+        selectedFiles:[],
+        encryptedFiles:[],
         idResource:false, //id server side to find files
-//ENCRYPTION
-        _keyWords:[],
-        getKey:function(){
-            return WebApp._keyWords.join(' ');
-        },
-        generateKey:function(){
-            WebApp._keyWords=['aaa','bbb','ccc','ddd'];
+        resourceUrl:'',
+        fullUrl:'',
+        generateUrl:function(){
+            WebApp.resourceUrl='#k='+WebApp.idResource;
+            WebApp.fullUrl=window.location.href+WebApp.resourceUrl;
         },
 //MODALS
         openModal:function(tpl,ctrl){
@@ -49,34 +45,30 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         showSeeKeysModal:function(){
             WebApp.openModal('ModalShowKeys.html');
         },
-//FILE
-        resourceUrl:'',
-        fullUrl:'',
-        generateUrl:function(){
-            WebApp.resourceUrl='#k='+WebApp.idResource;
-            WebApp.fullUrl=window.location.href+WebApp.resourceUrl;
-        },
 getTimeDiff:function(start,now){return (now-start);},
+//ENCRYPTION
+        _keyWords:[],
+        getKey:function(){
+            return WebApp._keyWords.join(' ');
+        },
+        generateKey:function(){
+            WebApp._keyWords=['aaa','bbb','ccc','ddd'];
+        },
         encryptSelectedFiles:function(){
-          return EncryptSrv.encryptArrFiles(WebApp.selectedFiles.bin,WebApp.getKey());
+          return EncryptSrv.encryptArrFiles(WebApp.selectedFiles,WebApp.getKey());
         },
         decryptFiles:function(){
-          EncryptSrv.decryptArrFiles(WebApp.encryptedFiles,WebApp.getKey());
-//           var Promises=[];
-//           angular.forEach(WebApp.encryptedFiles,function(file){
-//             Promises.push(FileSrv.decryptFile(file,WebApp.getKey()));
-//           });
-//           Promise.all(Promises).then(function(files){
-// console.log('all promises',files);
-// WebApp.ViewerApp.loadURLs(files);
-//           });
+          EncryptSrv.decryptFiles(WebApp.encryptedFiles,WebApp.getKey()).then(function(r){
+console.log('then',r);
+          });
         },
         handleFiles:function(){
             WebApp.showFileinput=false;
             WebApp.showFileinputLoader=true;
             //show files in viewer
-            WebApp.ViewerApp.loadURLs(WebApp.selectedFiles.url);
-            $timeout(function(){
+            WebApp.ViewerApp.loadURLs(WebApp.selectedFiles);
+
+            WebApp.ViewerApp.App.addEventListener("load-end",function(){
 var time=new Date();
               WebApp.encryptSelectedFiles().then(function(encryptedFiles){
 console.log('encryptedFiles',WebApp.getTimeDiff(time,new Date()),encryptedFiles);
@@ -84,10 +76,8 @@ console.log('encryptedFiles',WebApp.getTimeDiff(time,new Date()),encryptedFiles)
                 WebApp.showFileinputLoader=false;
                 WebApp.showSaveBtn=true;
                 $rootScope.$digest();
-              },function(e){
-console.log('error',e);
               });
-            },1000);
+            });
         },
         saveFiles:function(){
             FileSrv.saveFile(JSON.stringify(WebApp.encryptedFiles)).then(function(r){
@@ -101,6 +91,7 @@ console.log('error',e);
         },
         loadResource:function(id){
             FileSrv.getFile(id).then(function(r){
+console.log(JSON.parse(r.data.files));
                 WebApp.encryptedFiles=JSON.parse(r.data.files);
                 WebApp.openModal('ModalInsertKeys.html');
             },function(r){
@@ -117,7 +108,7 @@ console.log('error',e);
     }
 
     $rootScope.$watch('WebApp.selectedFiles',function(data){ //selected files, begin encrypt
-        if(data.bin.length && data.url.length){WebApp.handleFiles();}
+        if(data && data.length){WebApp.handleFiles();}
     });
 
     WebApp.generateKey();
@@ -136,25 +127,17 @@ console.log('error',e);
 })
 
 .directive('ngFileUploader',function(FileSrv){
-    return{
-        scope:{
-            selectedFiles:"=",
-        },
-        link:function(scope, element, attributes){
-          element.bind("change", function(changeEvent){
-            Promise.all([
-                FileSrv.readUploadedFiles(changeEvent.target.files),
-                FileSrv.readUploadedFiles(changeEvent.target.files,'bin')
-            ]).then(function(result){
-              scope.$apply(function(){
-                scope.selectedFiles={
-                  url:result[0],
-                  bin:result[1],
-                };
-              });
-            });
+  return{
+    scope:{selectedFiles:"=",},
+    link:function(scope, element, attributes){
+      element.bind("change", function(e){
+        FileSrv.readUploadedFiles(e.target.files).then(function(files){
+          scope.$apply(function(){
+            scope.selectedFiles=files;
           });
-        }
-      };
+        });
+      });
+    }
+  };
 })
 ;

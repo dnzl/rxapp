@@ -1,36 +1,35 @@
-WebsiteApp.factory('EncryptSrv',function(){
+WebsiteApp
+.factory('EncryptSrv',function(){
   var $this=this;
 
-  $this.encryptFile=function(file,key){
+  $this.decryptFiles=function(arrFiles,key){
     return new Promise(function(resolve,reject){
-      try{
-        var a=CryptoJS.AES.encrypt(file,key);
-        resolve(a.toString());
-      }catch(e){
-        reject(e);
+      var decryptWorker = new Worker("js/app/decrypter.js");
+      decryptWorker.postMessage({files:arrFiles,key:key});
+      decryptWorker.onmessage=function(e){
+        decryptWorker.terminate();
+        decryptWorker=undefined;
+        resolve(e.data);
       }
-    });
-  };
-
-  $this.decryptFile=function(file,key){
-    return new Promise(function(resolve,reject){
-      resolve(CryptoJS.AES.decrypt(file,key).toString());
     });
   };
 
   $this.encryptArrFiles=function(arrFiles,key){
     return new Promise(function(resolve,reject){
-      var encr = CryptoJS.algo.SHA256.create();
-      angular.forEach(arrFiles,function(file,i){encr.update(file);});
-      var result=encr.finalize();
-      resolve(result.toString());
+      var encryptWorker = new Worker("js/app/encrypter.js");
+      encryptWorker.postMessage({files:arrFiles,key:key});
+      encryptWorker.onmessage=function(e){
+        encryptWorker.terminate();
+        encryptWorker=undefined;
+        resolve(e.data);
+      }
     });
   };
 
   return $this;
 })
 
-.factory('FileSrv',function(){
+.factory('FileSrv',function($http){
     var $this=this;
 
     $this.saveFile=function(files){
@@ -41,17 +40,13 @@ WebsiteApp.factory('EncryptSrv',function(){
     };
 
     //reads the uploaded files, returns a promise.all resolve all the files as array of dataurls
-    $this.readUploadedFiles=function(fileList,readAs){
+    $this.readUploadedFiles=function(fileList){
       var Promises=[];
       angular.forEach(fileList,function(file,i){
         Promises.push(new Promise(function(resolve){
           var reader=new FileReader();
-          reader.onload=function(loadEvent){resolve(loadEvent.target.result);};
-          if(readAs=='bin'){
-            reader.readAsBinaryString(file);
-          }else{
-            reader.readAsDataURL(file);
-          }
+          reader.onload=function(e){resolve(e.target.result);};
+          reader.readAsDataURL(file);
         }));
       });
       return Promise.all(Promises);
