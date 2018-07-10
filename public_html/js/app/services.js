@@ -18,37 +18,13 @@ WebsiteApp.factory('EncryptSrv',function(){
     });
   };
 
-  //APPROACH: simulated synchronic
-  $this.arrFiles=[];
-  $this.key='';
-  $this.recEncryptArrFiles=function(i,arrEncryptedFiles){
-    if(i===undefined){i=0;}
-    if(arrEncryptedFiles===undefined){arrEncryptedFiles=[];}
+  $this.encryptArrFiles=function(arrFiles,key){
     return new Promise(function(resolve,reject){
-      $this.encryptFile($this.arrFiles[i],$this.key).then(function(encryptedFile){
-        arrEncryptedFiles[i]=encryptedFile;
-        if($this.arrFiles[i+1]!==undefined){
-          resolve($this.recEncryptArrFiles(i+1,arrEncryptedFiles));
-        }else{
-          resolve(arrEncryptedFiles);
-        }
-      });
+      var encr = CryptoJS.algo.SHA256.create();
+      angular.forEach(arrFiles,function(file,i){encr.update(file);});
+      var result=encr.finalize();
+      resolve(result.toString());
     });
-  };
-  $this.syncEncryptArrFiles=function(arrFiles,key){
-    $this.arrFiles=arrFiles;
-    $this.key=key;
-    return $this.recEncryptArrFiles();
-  };
-  // end simulated synchronic
-
-  //APPROACH: 100% sync
-  $this.asyncEncryptArrFiles=function(arrFiles,key){
-    var Promises=[];
-    angular.forEach(arrFiles,function(file){
-      Promises.push($this.encryptFile(file,key));
-    });
-    return Promise.all(Promises);
   };
 
   return $this;
@@ -65,17 +41,48 @@ WebsiteApp.factory('EncryptSrv',function(){
     };
 
     //reads the uploaded files, returns a promise.all resolve all the files as array of dataurls
-    $this.readUploadedFiles=function(fileList){
+    $this.readUploadedFiles=function(fileList,readAs){
       var Promises=[];
       angular.forEach(fileList,function(file,i){
         Promises.push(new Promise(function(resolve){
           var reader=new FileReader();
           reader.onload=function(loadEvent){resolve(loadEvent.target.result);};
-          reader.readAsDataURL(file);
+          if(readAs=='bin'){
+            reader.readAsBinaryString(file);
+          }else{
+            reader.readAsDataURL(file);
+          }
         }));
       });
       return Promise.all(Promises);
     };
 
     return $this;
-});
+})
+//https://solidfoundationwebdev.com/blog/posts/how-to-use-localstorage-in-angularjs
+.factory('$localstorage',['$window',function($window){
+    return {
+        set:function(key,value){
+            $window.localStorage[key]=value;
+        },
+        get:function(key,defaultValue){
+            return $window.localStorage[key]||defaultValue||false;
+        },
+        setObject:function(key,value){
+            $window.localStorage[key]=JSON.stringify(value);
+        },
+        getObject:function(key,defaultValue){
+            if($window.localStorage[key]!=undefined){
+                return JSON.parse($window.localStorage[key]);
+            }else{
+                return defaultValue||false;
+            }
+        },
+        remove:function(key){
+            $window.localStorage.removeItem(key);
+        },
+        clear:function(){
+            $window.localStorage.clear();
+        }
+    }
+}]);

@@ -8,35 +8,6 @@ Array.prototype.remove = Array.prototype.remove || function(val){
 };
 
 var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
-
-//https://solidfoundationwebdev.com/blog/posts/how-to-use-localstorage-in-angularjs
-.factory('$localstorage',['$window',function($window){
-    return {
-        set:function(key,value){
-            $window.localStorage[key]=value;
-        },
-        get:function(key,defaultValue){
-            return $window.localStorage[key]||defaultValue||false;
-        },
-        setObject:function(key,value){
-            $window.localStorage[key]=JSON.stringify(value);
-        },
-        getObject:function(key,defaultValue){
-            if($window.localStorage[key]!=undefined){
-                return JSON.parse($window.localStorage[key]);
-            }else{
-                return defaultValue||false;
-            }
-        },
-        remove:function(key){
-            $window.localStorage.removeItem(key);
-        },
-        clear:function(){
-            $window.localStorage.clear();
-        }
-    }
-}])
-
 .controller('BaseCtrl',function($rootScope,FileSrv,EncryptSrv,$uibModal,$timeout){
     var WebApp={
         ViewerApp:new ViewerApp(),
@@ -45,7 +16,10 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         showFileinput:true,
         showFileinputLoader:false,
         showSeeKeysBtn:false,
-        selectedFiles:false,
+        selectedFiles:{
+          url:[],
+          bin:[],
+        },
         encryptedFiles:false,
         idResource:false, //id server side to find files
 //ENCRYPTION
@@ -56,7 +30,6 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         generateKey:function(){
             WebApp._keyWords=['aaa','bbb','ccc','ddd'];
         },
-
 //MODALS
         openModal:function(tpl,ctrl){
             var ctrl = ctrl || 'ModalDefaultCtrl';
@@ -85,22 +58,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         },
 getTimeDiff:function(start,now){return (now-start);},
         encryptSelectedFiles:function(){
-//cant use while encrypt; ~20 secs
-var a=new Date();
-EncryptSrv.syncEncryptArrFiles(WebApp.selectedFiles,WebApp.getKey()).then(function(){
-  console.log('syncEncryptArrFiles',WebApp.getTimeDiff(a,new Date()));
-});
-
-var b=new Date();
-EncryptSrv.asyncEncryptArrFiles(WebApp.selectedFiles,WebApp.getKey()).then(function(){
-  console.log('asyncEncryptArrFiles',WebApp.getTimeDiff(b,new Date()));
-});
-
-
-
-
-return EncryptSrv.asyncEncryptArrFiles(WebApp.selectedFiles,WebApp.getKey());
-
+          return EncryptSrv.encryptArrFiles(WebApp.selectedFiles.bin,WebApp.getKey());
         },
         decryptFiles:function(){
           EncryptSrv.decryptArrFiles(WebApp.encryptedFiles,WebApp.getKey());
@@ -117,11 +75,11 @@ return EncryptSrv.asyncEncryptArrFiles(WebApp.selectedFiles,WebApp.getKey());
             WebApp.showFileinput=false;
             WebApp.showFileinputLoader=true;
             //show files in viewer
-            WebApp.ViewerApp.loadURLs(WebApp.selectedFiles);
+            WebApp.ViewerApp.loadURLs(WebApp.selectedFiles.url);
             $timeout(function(){
-//var time=new Date();
+var time=new Date();
               WebApp.encryptSelectedFiles().then(function(encryptedFiles){
-//console.log('encryptedFiles',WebApp.getTimeDiff(time,new Date()),encryptedFiles);
+console.log('encryptedFiles',WebApp.getTimeDiff(time,new Date()),encryptedFiles);
                 WebApp.encryptedFiles=encryptedFiles;
                 WebApp.showFileinputLoader=false;
                 WebApp.showSaveBtn=true;
@@ -159,7 +117,7 @@ console.log('error',e);
     }
 
     $rootScope.$watch('WebApp.selectedFiles',function(data){ //selected files, begin encrypt
-        if(data){WebApp.handleFiles();}
+        if(data.bin.length && data.url.length){WebApp.handleFiles();}
     });
 
     WebApp.generateKey();
@@ -180,13 +138,20 @@ console.log('error',e);
 .directive('ngFileUploader',function(FileSrv){
     return{
         scope:{
-            fileread:"="
+            selectedFiles:"=",
         },
         link:function(scope, element, attributes){
           element.bind("change", function(changeEvent){
-
-            FileSrv.readUploadedFiles(changeEvent.target.files).then(function(r){
-              scope.$apply(function(){scope.fileread=r;});
+            Promise.all([
+                FileSrv.readUploadedFiles(changeEvent.target.files),
+                FileSrv.readUploadedFiles(changeEvent.target.files,'bin')
+            ]).then(function(result){
+              scope.$apply(function(){
+                scope.selectedFiles={
+                  url:result[0],
+                  bin:result[1],
+                };
+              });
             });
           });
         }
