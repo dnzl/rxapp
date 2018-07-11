@@ -69,9 +69,7 @@ console.log('then',r);
             WebApp.ViewerApp.loadURLs(WebApp.selectedFiles);
 
             WebApp.ViewerApp.App.addEventListener("load-end",function(){
-var time=new Date();
               WebApp.encryptSelectedFiles().then(function(encryptedFiles){
-console.log('encryptedFiles',WebApp.getTimeDiff(time,new Date()),encryptedFiles);
                 WebApp.encryptedFiles=encryptedFiles;
                 WebApp.showFileinputLoader=false;
                 WebApp.showSaveBtn=true;
