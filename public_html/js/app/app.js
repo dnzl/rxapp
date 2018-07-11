@@ -17,6 +17,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         showFileinput:true,
         showFileinputLoader:false,
         showSeeKeysBtn:false,
+        showDecryptLoader:false,
         selectedFiles:[],
         encryptedFiles:[],
         idResource:false, //id server side to find files
@@ -29,7 +30,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
 //MODALS
         openModal:function(tpl,ctrl){
             var ctrl = ctrl || 'ModalDefaultCtrl';
-            $uibModal.open({
+            return $uibModal.open({
                 templateUrl:tpl,
                 controller:ctrl,
                 controllerAs:'$modalCtrl',
@@ -39,8 +40,11 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
                 animation:false,
             });
         },
+        modals:{
+          InsertKeys:false,
+        },
         showInsertKeysModal:function(){
-            WebApp.openModal('ModalInsertKeys.html');
+            WebApp.modals.InsertKeys=WebApp.openModal('ModalInsertKeys.html');
         },
         showSeeKeysModal:function(){
             WebApp.openModal('ModalShowKeys.html');
@@ -58,8 +62,11 @@ getTimeDiff:function(start,now){return (now-start);},
           return EncryptSrv.encryptArrFiles(WebApp.selectedFiles,WebApp.getKey());
         },
         decryptFiles:function(){
-          EncryptSrv.decryptFiles(WebApp.encryptedFiles,WebApp.getKey()).then(function(r){
-console.log('then',r);
+          WebApp.showDecryptLoader=true;
+          EncryptSrv.decryptFiles(WebApp.encryptedFiles,WebApp.getKey()).then(function(urls){
+console.log(urls);
+            WebApp.ViewerApp.loadURLs(urls);
+            WebApp.modals.InsertKeys.close();
           });
         },
         handleFiles:function(){
@@ -89,9 +96,8 @@ console.log('then',r);
         },
         loadResource:function(id){
             FileSrv.getFile(id).then(function(r){
-console.log(JSON.parse(r.data.files));
                 WebApp.encryptedFiles=JSON.parse(r.data.files);
-                WebApp.openModal('ModalInsertKeys.html');
+                WebApp.showInsertKeysModal();
             },function(r){
               //[TODO] handle nonextistent resource
               console.log('error',r);

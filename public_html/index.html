@@ -136,8 +136,15 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" ng-click="$modalCtrl.close()">Close</button>
-                        <button type="button" class="btn btn-primary" ng-click="WebApp.decryptFiles()">See Files</button>
+                        <button type="button" class="btn btn-secondary"
+                                ng-click="$modalCtrl.close()">Close</button>
+                        <button type="button" class="btn btn-primary"
+                                ng-click="WebApp.decryptFiles()"
+                                ng-show="!WebApp.showDecryptLoader">See Files</button>
+                        <button class="btn btn-primary btn-disabled" disabled
+                                ng-show="WebApp.showDecryptLoader">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </button>
                     </div>
             </script><!-- /#modal-insert-keys -->
 
@@ -172,7 +179,6 @@
 
         <!-- encryption -->
 <!--        <script type="text/javascript" src="node_modules/xkcd-password/index.js"></script>-->
-        <script src="js/vendor/crypto.js"></script>
 
         <script src="js/app/viewer.js"></script>
         <script src="js/app/app.js"></script>
