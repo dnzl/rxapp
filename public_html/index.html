@@ -27,12 +27,13 @@
                 <header class="wrapper clearfix">
                     <h1 class="title">Rx</h1>
                     <nav>
+
                         <button onclick="document.getElementById('input-file').click()"
                                 class="btn btn-secondary"
-                                ng-show="WebApp.showFileinput">
+                                ng-show="WebApp.show.fileinput">
                             <i class="fas fa-upload"></i> Select files
                         </button>
-                        <div ng-show="WebApp.showFileinputLoader">
+                        <div ng-show="WebApp.show.fileinputLoader">
                             <i class="fas fa-spinner fa-spin"></i>
                         </div>
 
@@ -50,10 +51,11 @@
                         </button>
 
                         <button id="save-button" class="btn btn-info"
-                                ng-show="WebApp.showSeeKeysBtn"
+                                ng-show="WebApp.show.seeKeysBtn"
                                 ng-click="WebApp.showSeeKeysModal()">
                             <i class="fas fa-eye"></i> See Keys
                         </button>
+                        {{WebApp.currentAction}}
                     </nav>
                 </header>
             </div>
@@ -120,32 +122,57 @@
             </script><!-- /#modal-show-keys -->
 
             <script type="text/ng-template" id="ModalInsertKeys.html">
+              <form>
                 <div class="modal-header">
                     <h3 class="modal-title" id="modal-insert-keys-title">Insert Keys</h3>
                 </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <input type="password" class="form-control input-passwort" autocomplete="off"
-                                    ng-model="WebApp._keyWords[0]"><br>
-                            <input type="password" class="form-control input-passwort" autocomplete="off"
-                                    ng-model="WebApp._keyWords[1]"><br>
-                            <input type="password" class="form-control input-passwort" autocomplete="off"
-                                    ng-model="WebApp._keyWords[2]"><br>
-                            <input type="password" class="form-control input-passwort" autocomplete="off"
-                                    ng-model="WebApp._keyWords[3]">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary"
-                                ng-click="$modalCtrl.close()">Close</button>
-                        <button type="button" class="btn btn-primary"
-                                ng-click="WebApp.decryptFiles()"
-                                ng-show="!WebApp.showDecryptLoader">See Files</button>
-                        <button class="btn btn-primary btn-disabled" disabled
-                                ng-show="WebApp.showDecryptLoader">
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </button>
-                    </div>
+                  <div class="modal-body">
+                      <div class="form-group">
+                          <input type="password" class="form-control input-passwort" autocomplete="off"
+                                  ng-model="WebApp._keyWords[0]"><br>
+                          <input type="password" class="form-control input-passwort" autocomplete="off"
+                                  ng-model="WebApp._keyWords[1]"><br>
+                          <input type="password" class="form-control input-passwort" autocomplete="off"
+                                  ng-model="WebApp._keyWords[2]"><br>
+                          <input type="password" class="form-control input-passwort" autocomplete="off"
+                                  ng-model="WebApp._keyWords[3]">
+                      </div>
+                      <div class="alert alert-danger" ng-show="WebApp.errors.decrypt.length">
+                        {{WebApp.errors.decrypt}}
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <!-- close modal -->
+                      <button type="button" class="btn btn-secondary"
+                              ng-click="$modalCtrl.close()">Close</button>
+
+                      <!-- submit btn -->
+                      <button type="submit" class="btn btn-primary"
+                              ng-click="WebApp.decryptFiles()"
+                              ng-show="!WebApp.show.decryptLoader">See Files</button>
+
+                      <!-- decrypt loader -->
+                      <button class="btn btn-primary btn-disabled" disabled
+                              ng-show="WebApp.show.decryptLoader">
+                          <i class="fas fa-spinner fa-spin"></i>
+                      </button>
+                  </div>
+                </form>
+            </script><!-- /#modal-insert-keys -->
+
+            <script type="text/ng-template" id="ModalDefaultMsg.html">
+              <form>
+                  <div class="modal-body">
+                      <div class="alert alert-danger" ng-show="WebApp.modalMsg.error.length">
+                        {{WebApp.modalMsg.error}}
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <!-- close modal -->
+                      <button type="button" class="btn btn-secondary"
+                              ng-click="$modalCtrl.close()">Close</button>
+                  </div>
+                </form>
             </script><!-- /#modal-insert-keys -->
 
 
@@ -177,11 +204,11 @@
         <!-- dwv -->
         <script type="text/javascript" src="node_modules/dwv/dist/dwv.js"></script>
 
-        <!-- encryption -->
-<!--        <script type="text/javascript" src="node_modules/xkcd-password/index.js"></script>-->
-
         <script src="js/app/viewer.js"></script>
         <script src="js/app/app.js"></script>
         <script src="js/app/services.js"></script>
+
+        <!-- encryption -->
+        <script type="text/javascript" src="js/vendor/xkcd-pw.js"></script>
     </body>
 </html>

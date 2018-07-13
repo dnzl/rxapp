@@ -19,8 +19,8 @@ var ViewerApp=function(){
     $this.init=function(){
         // initialise with the id of the container div
         $this.App.init({
-            "containerDivId":"dwv",
-            "tools":[
+            containerDivId:"dwv",
+            tools:[
                 "Scroll",
                 "WindowLevel",
 //                "ZoomAndPan",
@@ -30,6 +30,11 @@ var ViewerApp=function(){
 //                "Floodfill"
             ],
         });
+
+
+
+        $this.App.abortLoad();
+        $this.App.reset();
     };
 
     $this.init();

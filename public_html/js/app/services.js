@@ -2,57 +2,64 @@ WebsiteApp
 .factory('EncryptSrv',function(){
   var $this=this;
 
+  $this.parseKey=function(keyStr){
+    var k=keyStr.split(' '),
+        iv=k[k.length-1];
+        k=k.splice(0,3).join(' ');
+        return{
+          key:k,
+          iv:hex_sha1(iv),
+        };
+  };
+
   $this.decryptFiles=function(arrFiles,key){
+    var keys=$this.parseKey(key);
     return new Promise(function(resolve,reject){
       var decryptWorker = new Worker("js/app/decrypter.js");
-      decryptWorker.postMessage({files:arrFiles,key:key});
+      decryptWorker.postMessage({files:arrFiles,key:keys.key,iv:keys.iv});
       decryptWorker.onmessage=function(e){
         decryptWorker.terminate();
         decryptWorker=undefined;
-        resolve(e.data);
+        if(e.data=='error'){reject();}else{resolve(e.data);}
       }
     });
   };
 
   $this.encryptArrFiles=function(arrFiles,key){
+    var keys=$this.parseKey(key);
     return new Promise(function(resolve,reject){
       var encryptWorker = new Worker("js/app/encrypter.js");
-      encryptWorker.postMessage({files:arrFiles,key:key});
+      encryptWorker.postMessage({files:arrFiles,key:keys.key,iv:keys.iv});
       encryptWorker.onmessage=function(e){
         encryptWorker.terminate();
         encryptWorker=undefined;
-        resolve(e.data);
+        if(e.data=='error'){reject();}else{resolve(e.data);}
       }
     });
   };
-
   return $this;
 })
 
 .factory('FileSrv',function($http){
-    var $this=this;
+  var $this=this;
 
-    $this.saveFile=function(files){
-      return $http.post('backend.php',{files:files});
-    };
-    $this.getFile=function(id){
-      return $http.get('backend.php?id='+id);
-    };
+  $this.saveFile=function(files){return $http.post('backend.php',{files:files});};
+  $this.getFile=function(id){return $http.get('backend.php?id='+id);};
 
-    //reads the uploaded files, returns a promise.all resolve all the files as array of dataurls
-    $this.readUploadedFiles=function(fileList){
-      var Promises=[];
-      angular.forEach(fileList,function(file,i){
-        Promises.push(new Promise(function(resolve){
-          var reader=new FileReader();
-          reader.onload=function(e){resolve(e.target.result);};
-          reader.readAsDataURL(file);
-        }));
-      });
-      return Promise.all(Promises);
-    };
+  //reads the uploaded files, returns a promise.all resolve all the files as array of dataurls
+  $this.readUploadedFiles=function(fileList){
+    var Promises=[];
+    angular.forEach(fileList,function(file,i){
+      Promises.push(new Promise(function(resolve){
+        var reader=new FileReader();
+        reader.onload=function(e){resolve(e.target.result);};
+        reader.readAsDataURL(file);
+      }));
+    });
+    return Promise.all(Promises);
+  };
 
-    return $this;
+  return $this;
 })
 //https://solidfoundationwebdev.com/blog/posts/how-to-use-localstorage-in-angularjs
 .factory('$localstorage',['$window',function($window){
