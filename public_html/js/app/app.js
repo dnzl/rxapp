@@ -30,9 +30,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
   })(window.alert);
   */
 
-
     var WebApp={
-        ViewerApp:new ViewerApp(),
         showSaveBtn:false,
         disableFileinput:false,
         modalMsg:{
@@ -56,7 +54,8 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
           decrypt:false, //on decrypt
         },
         currentAction:'',
-        selectedFiles:[],
+        arrFiles:[],
+        currentFile:false,
         encryptedFiles:[],
         idResource:false, //id server side to find files
         resourceUrl:'',
@@ -81,12 +80,17 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         modals:{
           InsertKeys:false,
           ShowKeys:false,
+          Tags:false,
         },
         showInsertKeysModal:function(){
             WebApp.modals.InsertKeys=WebApp.openModal('ModalInsertKeys.html');
         },
         showSeeKeysModal:function(){
             WebApp.modals.ShowKeys=WebApp.openModal('ModalShowKeys.html');
+        },
+        tagsData:'',
+        showTagsModal:function(){
+            WebApp.modals.Tags=WebApp.openModal('ModalTags.html');
         },
 getTimeDiff:function(start,now){return (now-start);},
 //ENCRYPTION
@@ -97,8 +101,8 @@ getTimeDiff:function(start,now){return (now-start);},
         generateKey:function(){
             WebApp._keyWords=xkcd_pw_gen();
         },
-        encryptSelectedFiles:function(){
-          return EncryptSrv.encryptArrFiles(WebApp.selectedFiles,WebApp.getKey());
+        encryptArrFiles:function(){
+          return EncryptSrv.encryptArrFiles(WebApp.arrFiles,WebApp.getKey());
         },
         decryptFiles:function(){
           WebApp.show.decryptLoader=true;
@@ -119,22 +123,15 @@ getTimeDiff:function(start,now){return (now-start);},
           });
         },
         handleFiles:function(){
-            WebApp.show.fileinput=false;
-            WebApp.show.fileinputLoader=true;
-WebApp.currentAction='loading view...';
-            $timeout(function(){
-              try{
-                WebApp.ViewerApp.loadURLs(WebApp.selectedFiles); //show files in viewer
-              }catch(e){
-                console.log(e);
-              }
-            },1000);
-return;
-            WebApp.ViewerApp.App.addEventListener("load-end",function(){
-              //bg encrypt files
-              $rootScope.$apply(function(){
-WebApp.currentAction='encrypting...';
-              });
+//[TODO] si son multiples files, chekar si son img
+//if img: add cada una como item unico a la lista
+//else: manejar como 1 dcm, agregarlo a la lista
+//si no hay files en la lista, loadUrl en la app
+//else add file to lista, dont show in viewer
+            WebApp.currentFile=WebApp.selectedFiles;
+            WebApp.arrFiles.push(WebApp.selectedFiles);
+            WebApp.selectedFiles=[];
+/*return;
 
               WebApp.encryptSelectedFiles().then(function(encryptedFiles){
                 WebApp.encryptedFiles=encryptedFiles;
@@ -143,7 +140,8 @@ WebApp.currentAction='encrypting...';
 WebApp.currentAction='done';
                 $rootScope.$digest();
               });
-            });
+
+            });*/
         },
         saveFiles:function(){
             FileSrv.saveFile(JSON.stringify(WebApp.encryptedFiles)).then(function(r){
@@ -176,51 +174,11 @@ WebApp.currentAction='done';
     }
 
     $rootScope.$watch('WebApp.selectedFiles',function(data){ //selected files, begin encrypt
-        if(data && data.length){WebApp.handleFiles();}
+      if(data && data.length){WebApp.handleFiles();}
     });
 
     $rootScope.WebApp=WebApp;
 })
-.controller('ViewerCtrl',function($scope){
-    $scope.Viewer={
-      showColumn:false,
-    }
-
-    $scope.status = {
-    isopen: false
-  };
-
-  $scope.toggled = function(open) {
-    $log.log('Dropdown is now: ', open);
-  };
-
-  $scope.toggleDropdown = function($event) {
-//    $event.preventDefault();
-//    $event.stopPropagation();
-    $scope.status.isopen = !$scope.status.isopen;
-  };
-
-
-
-/*
-scroller pra pasar btwn slices
-    var range = document.getElementById("sliceRange");
-    range.min = 0;
-    app.addEventListener("load-end", function () {
-        range.max = app.getImage().getGeometry().getSize().getNumberOfSlices() - 1;
-    });
-    app.addEventListener("slice-change", function () {
-        range.value = app.getViewController().getCurrentPosition().k;
-    });
-    range.oninput = function () {
-        var pos = app.getViewController().getCurrentPosition();
-        pos.k = this.value;
-        app.getViewController().setCurrentPosition(pos);
-    }
-    */
-
-})
-
 .controller('ModalDefaultCtrl',function($uibModalInstance){
   var $ctrl = this;
   $ctrl.close = function(){$uibModalInstance.close();};
@@ -232,9 +190,7 @@ scroller pra pasar btwn slices
     link:function(scope, element, attributes){
       element.bind("change", function(e){
         FileSrv.readUploadedFiles(e.target.files).then(function(files){
-          scope.$apply(function(){
-            scope.selectedFiles=files;
-          });
+          scope.$apply(function(){scope.selectedFiles=files;});
         });
       });
     }

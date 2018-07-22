@@ -45,6 +45,7 @@ WebsiteApp
 
   $this.saveFile=function(files){return $http.post('backend.php',{files:files});};
   $this.getFile=function(id){return $http.get('backend.php?id='+id);};
+  $this.get=function(url){return $http.get(url);};
 
   //reads the uploaded files, returns a promise.all resolve all the files as array of dataurls
   $this.readUploadedFiles=function(fileList){

@@ -1,0 +1,60 @@
+<div id="dwv">
+  <nav class="toolbar">
+    <div class="wrapper">
+      <div ng-repeat="tool in tools" class="inline">
+        <button class="btn btn-default btn-sm"
+                ng-class="{'active':activeTool==tool.value}"
+                ng-value="tool.value"
+                ng-click="changeTool($event)">
+                <i class="fas fa-{{tool.ico}}"></i> {{tool.label}}
+        </button>
+      </div>
+
+      <!--
+      <div class="btn-group" uib-dropdown>
+        <button type="button" class="btn btn-default btn-sm" value="WindowLevel" ng-click="changeTool($event)"><i class="fas fa-signal"></i> Levels</button>
+        <button type="button" class="btn btn-default btn-sm" uib-dropdown-toggle>
+          <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu" uib-dropdown-menu>
+          abc
+        </div>
+      </div>
+      <div class="btn-group" uib-dropdown>
+        <button type="button" class="btn btn-default btn-sm"><i class="fas fa-pencil-alt"></i> Draw</button>
+        <button type="button" class="btn btn-default btn-sm" uib-dropdown-toggle>
+          <span class="caret"></span>
+        </button>
+        <div class="dropdown-menu" uib-dropdown-menu>
+          abc
+        </div>
+      </div>
+      <button class="btn btn-default btn-sm"><i class="fas fa-comment"></i> Comments</button>
+-->
+    </div>
+  </nav>
+    <div class="main wrapper clearfix">
+        <section>
+            <article id="app-main">
+              <div class="layerContainer">
+<!--                <div class="dropBox"></div>-->
+                <canvas class="imageLayer"></canvas>
+                <!-- <div class="drawDiv"></div>-->
+                <div class="infoLayer">
+                  <div class="infotl"></div><div class="infotc"></div>
+                  <div class="infotr"></div><div class="infocl"></div>
+                  <div class="infocr"></div><div class="infobl"></div>
+                  <div class="infobc"></div>
+                  <div class="infobr" style="bottom: 64px;"></div>
+                </div>
+              </div>
+            </article>
+
+            <aside id="app-column" ng-show="ViewerApp.showColumn">
+                <ul>
+                    <li><img style="width:100px;height:100px;background:#ccc;"></li>
+                </ul>
+            </aside>
+        </section>
+    </div>
+</div> <!-- #viewer.main-container -->

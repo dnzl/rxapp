@@ -29,7 +29,7 @@
                     <nav>
 
                         <button onclick="document.getElementById('input-file').click()"
-                                class="btn btn-secondary"
+                                class="btn btn-secondary btn-sm"
                                 ng-show="WebApp.show.fileinput">
                             <i class="fas fa-upload"></i> Select files
                         </button>
@@ -60,85 +60,10 @@
                 </header>
             </div>
 
-            <div id="dwv" class="main-container" ng-controller="ViewerCtrl">
-              <nav class="toolbar">
-                <div class="wrapper">
-                  <button class="btn btn-default btn-sm"><i class="fas fa-clone"></i> Scroll</button>
-                  <button class="btn btn-default btn-sm"><i class="fas fa-search-plus"></i> Zoom</button>
-                  <button class="btn btn-default btn-sm"><i class="fas fa-hand-paper"></i> Pan</button>
-                  <div class="btn-group" uib-dropdown>
-                    <button type="button" class="btn btn-default btn-sm"><i class="fas fa-signal"></i> Levels</button>
-                    <button type="button" class="btn btn-default btn-sm" uib-dropdown-toggle>
-                      <span class="caret"></span>
-                    </button>
-                    <div class="dropdown-menu" uib-dropdown-menu>
-                      abc
-                    </div>
-                  </div>
-                  <div class="btn-group" uib-dropdown>
-                    <button type="button" class="btn btn-default btn-sm"><i class="fas fa-pencil-alt"></i> Draw</button>
-                    <button type="button" class="btn btn-default btn-sm" uib-dropdown-toggle>
-                      <span class="caret"></span>
-                    </button>
-                    <div class="dropdown-menu" uib-dropdown-menu>
-                      abc
-                    </div>
-                  </div>
-                  <button class="btn btn-default btn-sm"><i class="fas fa-tag"></i> Tags</button>
-                  <button class="btn btn-default btn-sm"><i class="fas fa-info-circle"></i> Info</button>
-                  <button class="btn btn-default btn-sm"><i class="fas fa-comment"></i> Comments</button>
+            <div class="main-container">
+              <!-- Viewer -->
+              <ng-viewer current-file="WebApp.currentFile"></ng-viewer>
 
-                </div>
-              </nav>
-                <div class="main wrapper clearfix">
-                    <section>
-                        <article id="app-main">
-                          <div class="layerContainer">
-                            <canvas class="imageLayer"></canvas>
-                            <!--                                    <div class="drawDiv"></div>-->
-                            <div class="infoLayer">
-                              <div class="infotl">a</div>
-                              <div class="infotc">b</div>
-                              <div class="infotr">c</div>
-                              <div class="infocl">d</div>
-                              <div class="infocr">e</div>
-                              <div class="infobl">w</div>
-                              <div class="infobc">f</div>
-                              <div class="infobr" style="bottom: 64px;"></div>
-                              <div class="plot"></div>
-                            </div>
-
-                            <!-- Toolbox -->
-                            <div class="toolList" title="Toolbox">
-                              <ul></ul>
-                            </div>
-
-                            <!-- Tags -->
-                            <div class="tags" title="Tags"></div>
-                            <!-- History -->
-                            <div class="history" title="History"></div>
-
-                            <!-- DrawList -->
-                            <div class="drawList" title="Draw list"></div>
-                          </div>
-
-                        </article>
-
-                        <aside id="app-column" ng-show="ViewerApp.showColumn">
-                            <ul>
-                                <li><img style="width:100px;height:100px;background:#ccc;"></li>
-                            </ul>
-                        </aside>
-                    </section>
-
-                </div>
-            </div> <!-- #viewer.main-container -->
-
-            <div class="footer-container">
-
-                <footer class="wrapper">
-                    <h3>footer</h3>
-                </footer>
             </div>
 
             <!-- Modal -->
@@ -224,6 +149,36 @@
                 </form>
             </script><!-- /#modal-insert-keys -->
 
+            <script type="text/ng-template" id="ModalTags.html">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modal-tags-title">Tags</h3>
+                    <span>
+                      <input type="text" class="form-control"
+                            placeholder="Search tags..."
+                            ng-model="searchTags">
+                    </span>
+                </div>
+                <div class="modal-body modal-tags">
+                  <table class="table table-sm table-striped table-responsive-lg">
+                    <thead>
+                      <tr>
+                        <th scope="col">Label</th>
+                        <th scope="col">Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="tag in WebApp.tagsData | filter:searchTags">
+                        <td>{{tag.name}}</td>
+                        <td>{{tag.value}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" ng-click="$modalCtrl.close()">Close</button>
+                </div>
+            </script><!-- /#modal-tags -->
+
 
         </div><!-- /#app -->
 
@@ -253,8 +208,8 @@
         <!-- dwv -->
         <script type="text/javascript" src="node_modules/dwv/dist/dwv.js"></script>
 
-        <script src="js/app/viewer.js"></script>
         <script src="js/app/app.js"></script>
+        <script src="js/app/viewer.js"></script>
         <script src="js/app/services.js"></script>
 
         <!-- encryption -->

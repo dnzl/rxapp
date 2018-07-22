@@ -79,7 +79,7 @@ body {
 
 .header-container,
 .footer-container,
-.main aside{background: #ccc;}
+.main aside{background: #333;}
 .main aside li{list-style:none; border:#ccc solid 1px; padding:5px; margin:5px; text-align:center;display:block;}
 .main aside li img{max-width:100%; max-height:100px;}
 
@@ -127,11 +127,18 @@ header nav{padding:10px; text-align:right;}
 /* ==========================================================================
 Viewer
    ========================================================================== */
-
+body{background:#111;}
+h1{font-size:2em;vertical-align:middle;}
+header nav{padding:5px 10px;}
+.inline{display:inline;}
+.btn-default:not(:disabled):not(.disabled).active,
+.btn-default:not(:disabled):not(.disabled):active{
+  color:#fff; background-color:#555; border-color:#999; box-shadow:#000 inset 0 0 3px 1px;
+}
 
 .open > .dropdown-menu{display:block;}
 .open > a {outline:0;}
-.toolbar{ background:#666; padding:6px;}
+.toolbar{ background:#555; padding:6px; box-shadow:#000 0px 0px 5px 1px inset;}
 .btn-group>.btn:first-child{margin-right:0;padding-right:5px;}
 .btn-group>.btn:not(:first-child){padding-left:0;}
 
@@ -140,33 +147,69 @@ Viewer
 .imageLayer { position: absolute; }
 .drawDiv { position: absolute; pointer-events: none; }
 
+.infoLayer{color:#fff; font-size:.8em;line-height: normal;}
 .infoLayer ul { margin: 0; padding: 2px; list-style-type: none; }
 .infoLayer li { margin-top: 0; }
 .infoLayer canvas { margin: 0; padding: 2px; }
 .info { color: #cde; text-shadow: 1px 1px #000; font-size: 80%; }
 .infoc { color: #ff0; text-shadow: 1px 1px #000; font-size: 120%; }
 .infotl { position: absolute; top: 0; left: 0; text-align: left;
-   text-shadow: 0 1px 0 #000; }
+    text-shadow: 0 1px 0 #000; }
 .infotc { position: absolute; top: 0; left: 50%; right: 50%; text-align: center;
-   text-shadow: 0 1px 0 #000; }
+    text-shadow: 0 1px 0 #000; }
 .infotr { position: absolute; top: 0; right: 0; text-align: right;
-   text-shadow: 0 1px 0 #000; }
+    text-shadow: 0 1px 0 #000; }
 .infocl { position: absolute; bottom: 50%; left: 0; text-align: left;
-   text-shadow: 0 1px 0 #000; }
+    text-shadow: 0 1px 0 #000; }
 .infocr { position: absolute; bottom: 50%; right: 2px; text-align: right;
-   text-shadow: 0 1px 0 #000; }
+    text-shadow: 0 1px 0 #000; }
 .infobl { position: absolute; bottom: 0; left: 0; text-align: left;
-   text-shadow: 0 1px 0 #000; }
+    text-shadow: 0 1px 0 #000; }
 .infobc { position: absolute; bottom: 0; left: 50%; right: 50%; text-align: center;
-   text-shadow: 0 1px 0 #000; }
+    text-shadow: 0 1px 0 #000; }
 .infobr { position: absolute; bottom: 0; right: 0; text-align: right;
-   text-shadow: 0 1px 0 #000; }
+    text-shadow: 0 1px 0 #000; }
+
+
+.modal-content{background-color:#444;color:#fff;}
+.modal-header{border-bottom-color:#666;}
+.table-striped tbody tr:nth-of-type(even){background-color:rgba(0,0,0,.3)}
+.table thead{background-color:#222;}
+.modal-tags.modal-body{max-height:70vh;overflow:auto;}
 
 
 
 
+   #dwv { font-family: Arial, Helvetica, sans-serif; }
 
+   .button-row {
+     text-align: center;
+     justify-content: space-around;
+     margin: 0.2em;
+   }
+   .mat-raised-button {
+     margin: 0.1em;
+   }
+   .legend {
+     text-align: center;
+     font-size: 8pt;
+   }
 
+   /* Layers */
+   .layerContainer {
+       position: relative; padding: 0;
+       margin: auto; text-align: center; }
+   .imageLayer {
+       position: absolute;
+       left: 0px; }
+   .drawDiv {
+       position: absolute; pointer-events: none; }
+
+   /* drag&drop */
+   .dropBox {
+       border: 5px dashed #ccc;
+       margin: auto; text-align: center }
+   .dropBox.hover { border: 5px dashed #cc0; }
 
 
 

@@ -1,3 +1,115 @@
+dwv.utils.decodeQuery = dwv.utils.base.decodeQuery;
+dwv.gui.getElement = dwv.gui.base.getElement;
+dwv.gui.refreshElement = dwv.gui.base.refreshElement;
+dwv.gui.Scroll = dwv.gui.base.Scroll;
+//dwv.gui.DicomTags = dwv.gui.base.DicomTags;
+dwv.gui.postProcessTable = dwv.gui.base.postProcessTable;
+dwv.image.decoderScripts = {
+    "jpeg2000": "node_modules/dwv/decoders/pdfjs/decode-jpeg2000.js",
+    "jpeg-lossless": "node_modules/dwv/decoders/rii-mango/decode-jpegloss.js",
+    "jpeg-baseline": "node_modules/dwv/decoders/pdfjs/decode-jpegbaseline.js"
+};
+
+dwv.gui.displayProgress = function () {};
+dwv.gui.getWindowSize=function(){
+  var h=window.innerHeight-147; if(h<500){h=500;}
+  return {'width':window.innerWidth,'height':h};
+};
+
+WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope){
+  return{
+    scope:{selectedFiles:"=",currentFile:'='},
+    templateUrl:'viewer.html',
+    link:function(scope, element, attributes){
+
+
+      dwv.gui.DicomTags=function(app){
+        var base = new dwv.gui.base.DicomTags(app);
+          this.update = function(tagsData){
+              if(tagsData.length===0){return;} //nothing to show
+              $rootScope.WebApp.tagsData=tagsData;
+          };
+
+      };
+
+      function changeTool(e){
+        var val=e.currentTarget.value;
+        if(val=='Tags'){$rootScope.WebApp.showTagsModal();return;}
+        if(val=='Info'){scope.dwvApp.onToggleInfoLayer();return;}
+        scope.activeTool=val;
+        scope.dwvApp.onChangeTool(e);
+      };
+
+      function loadFiles(files){
+        scope.dwvApp.reset();
+        scope.dwvApp.loadURLs(files);
+
+        scope.dwvApp.addEventListener("load-end",function(){
+          if(files.length==1){
+            scope.$apply(function(){
+              changeTool({currentTarget:{value:'ZoomAndPan'}});
+            });
+          }
+        });
+      }
+
+      function initApp(){
+        scope.dwvApp = new dwv.App();
+        scope.dwvApp.init({
+          'containerDivId': 'dwv',
+          'fitToWindow': true,
+          "gui": [
+//            "tool",
+//              "load",
+//            "undo",
+//            "version",
+            "tags",
+//            "drawList"
+        ],
+          'tools': ['Scroll', 'ZoomAndPan','WindowLevel','Draw'],
+          'shapes': ['Ruler'],
+          'isMobile':false
+        });
+      }
+
+      dwv.i18nOnInitialised(function(){
+        dwv.gui.info.overlayMaps=false;
+        FileSrv.get(dwv.i18nGetLocalePath("overlays.json")).then(function(r){
+          dwv.gui.info.overlayMaps = r.data;
+          initApp();
+        },function(e){
+console.log(e);
+        })
+        .catch(function(e){
+console.log(e);
+        });
+      });
+
+      dwv.browser.check();
+      dwv.i18nInitialise("auto", "node_modules/dwv");
+
+      scope.tools=[
+        {label:'Scroll',value:'Scroll',ico:'clone'},
+        {label:'Zoom/Pan',value:'ZoomAndPan',ico:'search-plus'},
+        {label:'Levels',value:'WindowLevel',ico:'signal'},
+//        {label:'Draw',value:'Draw',ico:'pencil-alt'},
+        {label:'Tags',value:'Tags',ico:'tags'},
+        {label:'Info',value:'Info',ico:'info-circle'},
+      ];
+      scope.activeTool='Scroll';
+      scope.changeTool=changeTool;
+
+      scope.$watch('currentFile',function(data){ //selected files, begin encrypt
+        if(data && data.length){loadFiles(scope.currentFile);}
+      });
+
+
+    }
+  };
+});
+
+
+/*
 // Default colour maps.
 dwv.tool.colourMaps = {
     "plain": dwv.image.lut.plain,
@@ -10,23 +122,6 @@ dwv.tool.colourMaps = {
     "pet20step": dwv.image.lut.pet_20step
 };
 
-dwv.image.decoderScripts = {
-    "jpeg2000": "node_modules/dwv/decoders/pdfjs/decode-jpeg2000.js",
-    "jpeg-lossless": "node_modules/dwv/decoders/rii-mango/decode-jpegloss.js",
-    "jpeg-baseline": "node_modules/dwv/decoders/pdfjs/decode-jpegbaseline.js"
-};
-
-// base function to get elements
-dwv.gui.getElement=dwv.gui.base.getElement;
-dwv.gui.displayProgress=function(percent){};
-dwv.gui.getWindowSize = function () {
-  var a=angular.element(document.getElementById(id)).clientWidth;
-  console.log(a);
-    return { 'width': 200, 'height':200 };
-};
-
-var ViewerApp=function(){
-    var $this=this;
 
     // Focus
     dwv.gui.focusImage = dwv.gui.base.focusImage;
@@ -121,59 +216,6 @@ return;
         $.plot(div, [ data ], plotOptions);
     };
 
-    dwv.gui.setup = function(){
-    };
-
-    dwv.gui.setup();
-
-    // Toolbox
-    dwv.gui.Toolbox = function (app)
-    {
-        var base = new dwv.gui.base.Toolbox(app);
-
-        this.setup = function(list)
-        {
-//            base.setup(list);
-        }
-
-        this.display = function (bool)
-        {
-//            base.display(bool);
-        };
-        this.initialise = function (list)
-        {
-//            base.initialise(list);
-        };
-      };
-
-      dwv.i18nOnInitialised( function () {
-      //  dwv.gui.info.overlayMaps=false;
-        i18nInitialised=true;
-      //  launchApp();
-        // return;
-          // call next once the overlays are loaded
-          var onLoaded = function (data) {
-            console.log(data);
-              dwv.gui.info.overlayMaps = data;
-              i18nInitialised = true;
-              launchApp();
-          };
-          // load overlay map info
-          $.getJSON( dwv.i18nGetLocalePath("overlays.json"), onLoaded )
-          .fail( function () {
-              console.log("Using fallback overlays.");
-              $.getJSON( dwv.i18nGetFallbackLocalePath("overlays.json"), onLoaded );
-          });
-      });
-
-        // check browser support
-        dwv.browser.check();
-        // initialise i18n
-        dwv.i18nInitialise("auto", "js/locales");
-
-
-    $this.loadURLs=function(urls){$this.App.loadURLs(urls);};
-    $this.loadFiles=function(files){$this.App.loadFiles(files);};
 
     $this.init=function(){
 
@@ -213,7 +255,22 @@ return;
 
     };
 
-    $this.init();
 
-    return $this;
-};
+scroller pra pasar btwn slices
+    var range = document.getElementById("sliceRange");
+    range.min = 0;
+    app.addEventListener("load-end", function () {
+        range.max = app.getImage().getGeometry().getSize().getNumberOfSlices() - 1;
+    });
+    app.addEventListener("slice-change", function () {
+        range.value = app.getViewController().getCurrentPosition().k;
+    });
+    range.oninput = function () {
+        var pos = app.getViewController().getCurrentPosition();
+        pos.k = this.value;
+        app.getViewController().setCurrentPosition(pos);
+    }
+    */
+/*
+})
+*/
