@@ -69,8 +69,7 @@ body {
     ALL: Orange Theme
    =================== */
 
-.header-container {
-    border-bottom: 20px solid #666;
+.header-container{
 }
 
 .footer-container,
@@ -92,7 +91,7 @@ body {
     MOBILE: Menu
    ============== */
 
-nav{padding:10px; text-align:right;}
+header nav{padding:10px; text-align:right;}
 
 
 /* ==============
@@ -126,10 +125,42 @@ nav{padding:10px; text-align:right;}
 }
 
 /* ==========================================================================
-   Author's custom styles
+Viewer
    ========================================================================== */
 
 
+.open > .dropdown-menu{display:block;}
+.open > a {outline:0;}
+.toolbar{ background:#666; padding:6px;}
+.btn-group>.btn:first-child{margin-right:0;padding-right:5px;}
+.btn-group>.btn:not(:first-child){padding-left:0;}
+
+
+.layerContainer { position: relative; padding: 0; }
+.imageLayer { position: absolute; }
+.drawDiv { position: absolute; pointer-events: none; }
+
+.infoLayer ul { margin: 0; padding: 2px; list-style-type: none; }
+.infoLayer li { margin-top: 0; }
+.infoLayer canvas { margin: 0; padding: 2px; }
+.info { color: #cde; text-shadow: 1px 1px #000; font-size: 80%; }
+.infoc { color: #ff0; text-shadow: 1px 1px #000; font-size: 120%; }
+.infotl { position: absolute; top: 0; left: 0; text-align: left;
+   text-shadow: 0 1px 0 #000; }
+.infotc { position: absolute; top: 0; left: 50%; right: 50%; text-align: center;
+   text-shadow: 0 1px 0 #000; }
+.infotr { position: absolute; top: 0; right: 0; text-align: right;
+   text-shadow: 0 1px 0 #000; }
+.infocl { position: absolute; bottom: 50%; left: 0; text-align: left;
+   text-shadow: 0 1px 0 #000; }
+.infocr { position: absolute; bottom: 50%; right: 2px; text-align: right;
+   text-shadow: 0 1px 0 #000; }
+.infobl { position: absolute; bottom: 0; left: 0; text-align: left;
+   text-shadow: 0 1px 0 #000; }
+.infobc { position: absolute; bottom: 0; left: 50%; right: 50%; text-align: center;
+   text-shadow: 0 1px 0 #000; }
+.infobr { position: absolute; bottom: 0; right: 0; text-align: right;
+   text-shadow: 0 1px 0 #000; }
 
 
 
@@ -187,14 +218,14 @@ nav{padding:10px; text-align:right;}
 /* ====================
     WIDE: CSS3 Effects
    ==================== */
-
+/*
     .header-container,
     .main aside {
         -webkit-box-shadow: 0 5px 10px #aaa;
            -moz-box-shadow: 0 5px 10px #aaa;
                 box-shadow: 0 5px 10px #aaa;
     }
-
+*/
 /* ============
     WIDE: Menu
    ============ */
@@ -203,7 +234,7 @@ nav{padding:10px; text-align:right;}
         float: left;
     }
 
-    nav {
+    header nav {
         float: right;
         width: 38%;
     }

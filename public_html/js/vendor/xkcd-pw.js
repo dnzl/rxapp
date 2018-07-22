@@ -336,6 +336,4 @@ function xkcd_pw_gen()
         choices.push(xkcd_pw_gen_wordlist[index]);
     }
     return choices;
-    var resultSpan = document.getElementById("xkcd_pw_gen_result");
-    resultSpan.innerText = resultSpan.textContent = choices.join(" ");
 }

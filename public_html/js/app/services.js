@@ -51,11 +51,16 @@ WebsiteApp
     var Promises=[];
     angular.forEach(fileList,function(file,i){
       Promises.push(new Promise(function(resolve){
+// var dicomParser = new dwv.dicom.DicomParser();
+// dicomParser.parse(arrayBuffer);
+// var rawTags = dicomParser.getRawDicomElements();
+// var id=rawTags.x00080016.value[0];
         var reader=new FileReader();
         reader.onload=function(e){resolve(e.target.result);};
         reader.readAsDataURL(file);
       }));
     });
+
     return Promise.all(Promises);
   };
 

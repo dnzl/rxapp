@@ -60,17 +60,67 @@
                 </header>
             </div>
 
-            <div id="viewer" class="main-container" ng-controller="ViewerCtrl">
+            <div id="dwv" class="main-container" ng-controller="ViewerCtrl">
+              <nav class="toolbar">
+                <div class="wrapper">
+                  <button class="btn btn-default btn-sm"><i class="fas fa-clone"></i> Scroll</button>
+                  <button class="btn btn-default btn-sm"><i class="fas fa-search-plus"></i> Zoom</button>
+                  <button class="btn btn-default btn-sm"><i class="fas fa-hand-paper"></i> Pan</button>
+                  <div class="btn-group" uib-dropdown>
+                    <button type="button" class="btn btn-default btn-sm"><i class="fas fa-signal"></i> Levels</button>
+                    <button type="button" class="btn btn-default btn-sm" uib-dropdown-toggle>
+                      <span class="caret"></span>
+                    </button>
+                    <div class="dropdown-menu" uib-dropdown-menu>
+                      abc
+                    </div>
+                  </div>
+                  <div class="btn-group" uib-dropdown>
+                    <button type="button" class="btn btn-default btn-sm"><i class="fas fa-pencil-alt"></i> Draw</button>
+                    <button type="button" class="btn btn-default btn-sm" uib-dropdown-toggle>
+                      <span class="caret"></span>
+                    </button>
+                    <div class="dropdown-menu" uib-dropdown-menu>
+                      abc
+                    </div>
+                  </div>
+                  <button class="btn btn-default btn-sm"><i class="fas fa-tag"></i> Tags</button>
+                  <button class="btn btn-default btn-sm"><i class="fas fa-info-circle"></i> Info</button>
+                  <button class="btn btn-default btn-sm"><i class="fas fa-comment"></i> Comments</button>
+
+                </div>
+              </nav>
                 <div class="main wrapper clearfix">
-
-                    <section id="viewer">
-                        <article id="main-img">
-
-                            <div id="dwv">
-                                <div class="layerContainer">
-                                    <canvas class="imageLayer"></canvas>
-                                </div>
+                    <section>
+                        <article id="app-main">
+                          <div class="layerContainer">
+                            <canvas class="imageLayer"></canvas>
+                            <!--                                    <div class="drawDiv"></div>-->
+                            <div class="infoLayer">
+                              <div class="infotl">a</div>
+                              <div class="infotc">b</div>
+                              <div class="infotr">c</div>
+                              <div class="infocl">d</div>
+                              <div class="infocr">e</div>
+                              <div class="infobl">w</div>
+                              <div class="infobc">f</div>
+                              <div class="infobr" style="bottom: 64px;"></div>
+                              <div class="plot"></div>
                             </div>
+
+                            <!-- Toolbox -->
+                            <div class="toolList" title="Toolbox">
+                              <ul></ul>
+                            </div>
+
+                            <!-- Tags -->
+                            <div class="tags" title="Tags"></div>
+                            <!-- History -->
+                            <div class="history" title="History"></div>
+
+                            <!-- DrawList -->
+                            <div class="drawList" title="Draw list"></div>
+                          </div>
 
                         </article>
 
@@ -79,11 +129,10 @@
                                 <li><img style="width:100px;height:100px;background:#ccc;"></li>
                             </ul>
                         </aside>
-
                     </section>
 
-                </div> <!-- #main -->
-            </div> <!-- #main-container -->
+                </div>
+            </div> <!-- #viewer.main-container -->
 
             <div class="footer-container">
 
@@ -184,11 +233,11 @@
         <script src="https://code.angularjs.org/1.6.10/angular-touch.min.js"></script>
         <script type="text/javascript" src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js"></script>
         <script type="text/javascript" src="node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
-<!--
 
 <script type="text/javascript" src="node_modules/dwv/node_modules/i18next/i18next.min.js"></script>
 <script type="text/javascript" src="node_modules/dwv/node_modules/i18next-xhr-backend/i18nextXHRBackend.min.js"></script>
 <script type="text/javascript" src="node_modules/dwv/node_modules/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.min.js"></script>
+<!--
 <script type="text/javascript" src="node_modules/dwv/node_modules/jszip/dist/jszip.min.js"></script>
 <!-- decoders --
 <script type="text/javascript" src="node_modules/dwv/decoders/pdfjs/jpx.js"></script>

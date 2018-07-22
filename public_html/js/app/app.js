@@ -129,11 +129,11 @@ WebApp.currentAction='loading view...';
                 console.log(e);
               }
             },1000);
-
+return;
             WebApp.ViewerApp.App.addEventListener("load-end",function(){
               //bg encrypt files
               $rootScope.$apply(function(){
-WebApp.currentAction='encrypting...';                
+WebApp.currentAction='encrypting...';
               });
 
               WebApp.encryptSelectedFiles().then(function(encryptedFiles){
@@ -182,9 +182,43 @@ WebApp.currentAction='done';
     $rootScope.WebApp=WebApp;
 })
 .controller('ViewerCtrl',function($scope){
-    $scope.ViewerApp={
-        showColumn:false,
+    $scope.Viewer={
+      showColumn:false,
     }
+
+    $scope.status = {
+    isopen: false
+  };
+
+  $scope.toggled = function(open) {
+    $log.log('Dropdown is now: ', open);
+  };
+
+  $scope.toggleDropdown = function($event) {
+//    $event.preventDefault();
+//    $event.stopPropagation();
+    $scope.status.isopen = !$scope.status.isopen;
+  };
+
+
+
+/*
+scroller pra pasar btwn slices
+    var range = document.getElementById("sliceRange");
+    range.min = 0;
+    app.addEventListener("load-end", function () {
+        range.max = app.getImage().getGeometry().getSize().getNumberOfSlices() - 1;
+    });
+    app.addEventListener("slice-change", function () {
+        range.value = app.getViewController().getCurrentPosition().k;
+    });
+    range.oninput = function () {
+        var pos = app.getViewController().getCurrentPosition();
+        pos.k = this.value;
+        app.getViewController().setCurrentPosition(pos);
+    }
+    */
+
 })
 
 .controller('ModalDefaultCtrl',function($uibModalInstance){
