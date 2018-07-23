@@ -123,14 +123,11 @@ getTimeDiff:function(start,now){return (now-start);},
           });
         },
         handleFiles:function(){
-//[TODO] si son multiples files, chekar si son img
-//if img: add cada una como item unico a la lista
-//else: manejar como 1 dcm, agregarlo a la lista
-//si no hay files en la lista, loadUrl en la app
-//else add file to lista, dont show in viewer
-            WebApp.currentFile=WebApp.selectedFiles;
-            WebApp.arrFiles.push(WebApp.selectedFiles);
-            WebApp.selectedFiles=[];
+            if(!WebApp.currentFile){WebApp.currentFile=WebApp.uploadedFiles[0];}
+            angular.forEach(WebApp.uploadedFiles,function(file){
+              WebApp.arrFiles.push(file);
+            });
+            WebApp.uploadedFiles=[];
 /*return;
 
               WebApp.encryptSelectedFiles().then(function(encryptedFiles){
@@ -173,7 +170,7 @@ WebApp.currentAction='done';
       WebApp.generateKey();
     }
 
-    $rootScope.$watch('WebApp.selectedFiles',function(data){ //selected files, begin encrypt
+    $rootScope.$watch('WebApp.uploadedFiles',function(data){ //selected files, begin encrypt
       if(data && data.length){WebApp.handleFiles();}
     });
 
@@ -186,14 +183,56 @@ WebApp.currentAction='done';
 
 .directive('ngFileUploader',function(FileSrv){
   return{
-    scope:{selectedFiles:"=",},
+    scope:{uploadedFiles:"=",},
     link:function(scope, element, attributes){
+
+      function saveAsOneFile(fileList){
+        var newFile={
+          id:randomString(),
+          name:'N/A',
+          type:'',
+          thumbnail:false,
+        };
+        return new Promise(function(resolve){
+          FileSrv.readUploadedFiles(fileList).then(function(fileData){
+            newFile.fileData=fileData;
+            resolve(newFile);
+          });
+        });
+      }
+
+
       element.bind("change", function(e){
-        FileSrv.readUploadedFiles(e.target.files).then(function(files){
-          scope.$apply(function(){scope.selectedFiles=files;});
+        var selectedFiles=e.target.files,
+            Promises=[],
+            isCollection=true;
+        angular.forEach(selectedFiles,function(file){
+          var newFile={
+            id:randomString(),
+            name:file.name,
+            type:file.type.toLowerCase(),
+          },
+          isImg=newFile.type.substr(0,5)=='image';
+          if(newFile.type=='application/dicom' || isImg){
+            isCollection=false;
+            Promises.push(new Promise(function(resolve){
+              newFile.size=file.size;
+              FileSrv.readUploadedFile(file).then(function(fileData){
+                newFile.fileData=[fileData];
+                if(isImg){newFile.thumbnail=fileData;}
+                resolve(newFile);
+              });
+            }));
+          }
+        });
+        if(isCollection){Promises.push(saveAsOneFile(selectedFiles));}
+
+        Promise.all(Promises).then(function(filesList){
+          scope.$apply(function(){
+            scope.uploadedFiles=filesList;
+          });
         });
       });
     }
-  };
-})
-;
+  }
+});

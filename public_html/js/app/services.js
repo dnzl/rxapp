@@ -64,6 +64,14 @@ WebsiteApp
 
     return Promise.all(Promises);
   };
+  
+  $this.readUploadedFile=function(file){
+    return new Promise(function(resolve){
+      var reader=new FileReader();
+      reader.onload=function(e){resolve(e.target.result);};
+      reader.readAsDataURL(file);
+    });
+  };
 
   return $this;
 })

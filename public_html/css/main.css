@@ -127,6 +127,7 @@ header nav{padding:10px; text-align:right;}
 /* ==========================================================================
 Viewer
    ========================================================================== */
+a{cursor:pointer;}
 body{background:#111;}
 h1{font-size:2em;vertical-align:middle;}
 header nav{padding:5px 10px;}
@@ -135,6 +136,13 @@ header nav{padding:5px 10px;}
 .btn-default:not(:disabled):not(.disabled):active{
   color:#fff; background-color:#555; border-color:#999; box-shadow:#000 inset 0 0 3px 1px;
 }
+
+.files-list{padding:5px 10px;}
+.files-list li{display:inline-block;}
+.files-list li:hover{opacity:.75;}
+.file-thumbnail{width:90px;height:90px;background:#ccc;}
+.main aside{padding:5px 10px;}
+.main aside li{overflow:hidden;display:inline-block;width:45%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 
 .open > .dropdown-menu{display:block;}
 .open > a {outline:0;}

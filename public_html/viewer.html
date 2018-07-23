@@ -1,15 +1,15 @@
 <div id="dwv">
   <nav class="toolbar">
     <div class="wrapper">
-      <div ng-repeat="tool in tools" class="inline">
+      <div ng-repeat="tool in ViewerApp.tools" class="inline">
         <button class="btn btn-default btn-sm"
-                ng-class="{'active':activeTool==tool.value}"
+                ng-class="{'active':ViewerApp.activeTool==tool.value || tool.active}"
                 ng-value="tool.value"
-                ng-click="changeTool($event)">
+                ng-click="ViewerApp.changeTool($event)"
+                ng-disabled="tool.disabled">
                 <i class="fas fa-{{tool.ico}}"></i> {{tool.label}}
         </button>
       </div>
-
       <!--
       <div class="btn-group" uib-dropdown>
         <button type="button" class="btn btn-default btn-sm" value="WindowLevel" ng-click="changeTool($event)"><i class="fas fa-signal"></i> Levels</button>
@@ -20,16 +20,6 @@
           abc
         </div>
       </div>
-      <div class="btn-group" uib-dropdown>
-        <button type="button" class="btn btn-default btn-sm"><i class="fas fa-pencil-alt"></i> Draw</button>
-        <button type="button" class="btn btn-default btn-sm" uib-dropdown-toggle>
-          <span class="caret"></span>
-        </button>
-        <div class="dropdown-menu" uib-dropdown-menu>
-          abc
-        </div>
-      </div>
-      <button class="btn btn-default btn-sm"><i class="fas fa-comment"></i> Comments</button>
 -->
     </div>
   </nav>
@@ -51,8 +41,20 @@
             </article>
 
             <aside id="app-column" ng-show="ViewerApp.showColumn">
-                <ul>
-                    <li><img style="width:100px;height:100px;background:#ccc;"></li>
+                <ul class="files-list">
+                    <li ng-repeat="item in arrFiles">
+                      <a ng-click="ViewerApp.openFile(item)">
+                        <img ng-show="item.thumbnail" ng-src="{{item.thumbnail?item.thumbnail:''}}" class="file-thumbnail">
+
+                        <div id="{{'app-thumb-'+item.id}}" ng-show="!item.thumbnail" class="app-thumb">
+                          <div class="layerContainer">
+                            <canvas class="imageLayer"></canvas>
+                          </div>
+                        </div>
+
+                        <br>{{item.name}}
+                      </a>
+                    </li>
                 </ul>
             </aside>
         </section>

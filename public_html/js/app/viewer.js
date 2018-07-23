@@ -16,47 +16,65 @@ dwv.gui.getWindowSize=function(){
   return {'width':window.innerWidth,'height':h};
 };
 
-WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope){
+WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
   return{
-    scope:{selectedFiles:"=",currentFile:'='},
+    scope:{arrFiles:"=",currentFile:'='},
     templateUrl:'viewer.html',
     link:function(scope, element, attributes){
 
+      var ViewerApp={
+        tools:[
+          {label:'Scroll',value:'Scroll',ico:'clone'},
+          {label:'Zoom/Pan',value:'ZoomAndPan',ico:'search-plus'},
+          {label:'Levels',value:'WindowLevel',ico:'signal'},
+  //        {label:'Draw',value:'Draw',ico:'pencil-alt'},
+          {label:'Tags',value:'Tags',ico:'tags'},
+          {label:'Info',value:'Info',ico:'info-circle',active:true},
+        ],
+        activeTool:'Scroll',
+        changeTool:changeTool,
+        openFile:openFile,
+        showColumn:true,
+      };
 
       dwv.gui.DicomTags=function(app){
         var base = new dwv.gui.base.DicomTags(app);
           this.update = function(tagsData){
-              if(tagsData.length===0){return;} //nothing to show
+              if(!tagsData || tagsData.length===0){getToolBtn('Tags').disabled=true; return;}
+              getToolBtn('Tags').disabled=false;
               $rootScope.WebApp.tagsData=tagsData;
           };
-
       };
+
+      function getToolBtn(toolname){
+        return $filter('filter')(ViewerApp.tools, {value:toolname})[0];
+      }
 
       function changeTool(e){
         var val=e.currentTarget.value;
         if(val=='Tags'){$rootScope.WebApp.showTagsModal();return;}
-        if(val=='Info'){scope.dwvApp.onToggleInfoLayer();return;}
-        scope.activeTool=val;
+        if(val=='Info'){
+          scope.dwvApp.onToggleInfoLayer();
+          var btn=getToolBtn('Info'); btn.active=!btn.active;
+          return;
+        }
+        ViewerApp.activeTool=val;
         scope.dwvApp.onChangeTool(e);
-      };
+      }
+
+      function openFile(file){
+        scope.currentFile=file;
+      }
 
       function loadFiles(files){
         scope.dwvApp.reset();
         scope.dwvApp.loadURLs(files);
-
-        scope.dwvApp.addEventListener("load-end",function(){
-          if(files.length==1){
-            scope.$apply(function(){
-              changeTool({currentTarget:{value:'ZoomAndPan'}});
-            });
-          }
-        });
       }
 
       function initApp(){
         scope.dwvApp = new dwv.App();
         scope.dwvApp.init({
-          'containerDivId': 'dwv',
+          'containerDivId': 'app-main',
           'fitToWindow': true,
           "gui": [
 //            "tool",
@@ -70,6 +88,28 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope){
           'shapes': ['Ruler'],
           'isMobile':false
         });
+
+        scope.dwvApp.addEventListener("load-end",function(a,b,c){
+          scope.$apply(function(){
+            if(scope.currentFile.fileData.length==1){
+              getToolBtn('Scroll').disabled=true;
+              ViewerApp.changeTool({currentTarget:{value:'ZoomAndPan'}});
+            }else{
+              getToolBtn('Scroll').disabled=false;
+            }
+          });
+        });
+      }
+
+      scope.thumbs={};
+      function createThumbnailApp(file){
+        if(thumbs[file.id]===undefined){
+          var app=new dwv.App();
+          app.init({"containerDivId": "app-thumb-"+file.id});
+          app.loadURLs(file.fileData);
+          scope.thumbs[file.id]=app;
+console.log(file,file.id,file.fileData,app);
+        }
       }
 
       dwv.i18nOnInitialised(function(){
@@ -88,22 +128,22 @@ console.log(e);
       dwv.browser.check();
       dwv.i18nInitialise("auto", "node_modules/dwv");
 
-      scope.tools=[
-        {label:'Scroll',value:'Scroll',ico:'clone'},
-        {label:'Zoom/Pan',value:'ZoomAndPan',ico:'search-plus'},
-        {label:'Levels',value:'WindowLevel',ico:'signal'},
-//        {label:'Draw',value:'Draw',ico:'pencil-alt'},
-        {label:'Tags',value:'Tags',ico:'tags'},
-        {label:'Info',value:'Info',ico:'info-circle'},
-      ];
-      scope.activeTool='Scroll';
-      scope.changeTool=changeTool;
-
-      scope.$watch('currentFile',function(data){ //selected files, begin encrypt
-        if(data && data.length){loadFiles(scope.currentFile);}
+      scope.$watch('currentFile',function(data){
+        if(data && !angular.equals(data,{})){
+          loadFiles(scope.currentFile.fileData);
+        }
       });
 
-
+      scope.$watch('arrFiles',function(data){
+        if(data && !angular.equals(data,{})){
+          $timeout(function(){
+            angular.forEach(scope.arrFiles,function(file){
+              createThumbnailApp(file);
+            });
+          },5000);
+        }
+      },true);
+      scope.ViewerApp=ViewerApp;
     }
   };
 });

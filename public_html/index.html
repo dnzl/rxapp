@@ -42,7 +42,7 @@
                                ng-change="WebApp.selectFiles(this.files)"
                                ng-model="sFiles"
                                ng-disabled="WebApp.disableFileinput"
-                               selected-files="WebApp.selectedFiles">
+                               uploaded-files="WebApp.uploadedFiles">
 
                         <button id="save-button" class="btn btn-primary"
                                 ng-show="WebApp.showSaveBtn"
@@ -62,7 +62,8 @@
 
             <div class="main-container">
               <!-- Viewer -->
-              <ng-viewer current-file="WebApp.currentFile"></ng-viewer>
+              <ng-viewer current-file="WebApp.currentFile"
+                          arr-files="WebApp.arrFiles"></ng-viewer>
 
             </div>
 
