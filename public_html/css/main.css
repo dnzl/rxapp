@@ -95,7 +95,9 @@ Viewer
 a{cursor:pointer;}
 body{background:#111;}
 h1{font-size:2em;vertical-align:middle;}
-header nav{padding:5px 10px;}
+header nav{padding:5px 25px 5px 10px; position:relative;}
+.header-container{background-color:#333;}
+.header-loader{position:absolute; top:8px; right:0; color:#fff;}
 .inline{display:inline;}
 .btn-default:not(:disabled):not(.disabled).active,
 .btn-default:not(:disabled):not(.disabled):active{
@@ -115,7 +117,8 @@ header nav{padding:5px 10px;}
 .btn-group>.btn:first-child{margin-right:0;padding-right:5px;}
 .btn-group>.btn:not(:first-child){padding-left:0;}
 
-
+#app-content{position:relative;}
+.loader-overlay{position:absolute; background:rgba(0,0,0,.5); top:0; left:0; bottom:0; right:0; z-index:9999; font-size:5em; color:#999; line-height:5em; text-align:center;}
 .layerContainer { position: relative; padding: 0;margin:auto; }
 .imageLayer { position: absolute; }
 .drawDiv { position: absolute; pointer-events: none; }
@@ -160,9 +163,7 @@ header nav{padding:5px 10px;}
 .gutter {background-color: #666;box-shadow:#000 0px 0px 2px 0px inset;}
 .gutter.gutter-horizontal{cursor: ew-resize;}
 .gutter.gutter-vertical{cursor: ns-resize;}
-.split.split-horizontal, .gutter.gutter-horizontal {height:500px;float:left;width:5px;}
-
-
+.split.split-horizontal, .gutter.gutter-horizontal {min-height:500px;float:left;width:5px;}
 
 /* ==========================================================================
    Media Queries

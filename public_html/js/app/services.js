@@ -12,11 +12,11 @@ WebsiteApp
         };
   };
 
-  $this.decryptFiles=function(arrFiles,key){
+  $this.decryptFile=function(file,key){
     var keys=$this.parseKey(key);
     return new Promise(function(resolve,reject){
       var decryptWorker = new Worker("js/app/decrypter.js");
-      decryptWorker.postMessage({files:arrFiles,key:keys.key,iv:keys.iv});
+      decryptWorker.postMessage({file:file,key:keys.key,iv:keys.iv});
       decryptWorker.onmessage=function(e){
         decryptWorker.terminate();
         decryptWorker=undefined;
@@ -25,11 +25,11 @@ WebsiteApp
     });
   };
 
-  $this.encryptArrFiles=function(arrFiles,key){
+  $this.encryptFile=function(file,key){
     var keys=$this.parseKey(key);
     return new Promise(function(resolve,reject){
       var encryptWorker = new Worker("js/app/encrypter.js");
-      encryptWorker.postMessage({files:arrFiles,key:keys.key,iv:keys.iv});
+      encryptWorker.postMessage({file:file,key:keys.key,iv:keys.iv});
       encryptWorker.onmessage=function(e){
         encryptWorker.terminate();
         encryptWorker=undefined;
@@ -43,8 +43,9 @@ WebsiteApp
 .factory('FileSrv',function($http){
   var $this=this;
 
-  $this.saveFile=function(files){return $http.post('backend.php',{files:files});};
-  $this.getFile=function(id){return $http.get('backend.php?id='+id);};
+  $this.createGallery=function(){return $http.get('backend.php?c=gallery');}
+  $this.saveFile=function(idGallery,file){return $http.post('backend.php',{gallery_id:idGallery,file:file});};
+  $this.getGallery=function(idGallery){return $http.get('backend.php?gallery_id='+idGallery);};
   $this.get=function(url){return $http.get(url);};
 
   //reads the uploaded files, returns a promise.all resolve all the files as array of dataurls
@@ -64,7 +65,7 @@ WebsiteApp
 
     return Promise.all(Promises);
   };
-  
+
   $this.readUploadedFile=function(file){
     return new Promise(function(resolve){
       var reader=new FileReader();

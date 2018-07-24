@@ -31,8 +31,6 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
   */
 
     var WebApp={
-        showSaveBtn:false,
-        disableFileinput:false,
         modalMsg:{
           error:false,
           msg:false,
@@ -40,9 +38,9 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         },
         show:{
           fileinput:true,
-          fileinputLoader:false,
+          headerLoader:false,
           seeKeysBtn:false,
-          decryptLoader:false,
+          saveBtn:false,
         },
         errors:{
           default:false, //show on modal
@@ -57,12 +55,12 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         arrFiles:[],
         currentFile:false,
         encryptedFiles:[],
-        idResource:false, //id server side to find files
+        idGallery:false, //id server side to find files
         resourceUrl:'',
         fullUrl:'',
         generateUrl:function(){
-            WebApp.resourceUrl='#k='+WebApp.idResource;
-            WebApp.fullUrl=window.location.href+WebApp.resourceUrl;
+            WebApp.resourceUrl='#k='+WebApp.idGallery;
+            WebApp.fullUrl=location.protocol+'//'+location.host+location.pathname+WebApp.resourceUrl;
         },
 //MODALS
         openModal:function(tpl,ctrl){
@@ -95,77 +93,98 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
 getTimeDiff:function(start,now){return (now-start);},
 //ENCRYPTION
         _keyWords:[],
-        getKey:function(){
-            return WebApp._keyWords.join(' ');
-        },
-        generateKey:function(){
-            WebApp._keyWords=xkcd_pw_gen();
-        },
-        encryptArrFiles:function(){
-          return EncryptSrv.encryptArrFiles(WebApp.arrFiles,WebApp.getKey());
+        getKey:function(){return WebApp._keyWords.join(' ');},
+        generateKey:function(){WebApp._keyWords=xkcd_pw_gen();},
+        loadGallery:function(idGallery){
+          WebApp.idGallery=idGallery;
+          WebApp.generateUrl();
+          WebApp.show.headerLoader=true;
+          FileSrv.getGallery(idGallery).then(function(r){
+            if(r.data.status=='error'){
+              alert("Gallery not found");
+              $timeout(function(){
+                window.location.href=location.protocol+'//'+location.host+location.pathname;
+              },5000);
+              return;
+            }
+            WebApp.encryptedFiles=r.data.files;
+            WebApp.showInsertKeysModal();
+          },function(e){
+alert('Unable to load gallery',e);
+          });
         },
         decryptFiles:function(){
+          WebApp.errors.decrypt='';
           WebApp.show.decryptLoader=true;
-          WebApp.errors.decrypt=false;
-          EncryptSrv.decryptFiles(WebApp.encryptedFiles,WebApp.getKey()).then(function(urls){
-            WebApp.encryptedFiles=false;
-            WebApp.ViewerApp.loadURLs(urls);
+          var Promises=[];
+          angular.forEach(WebApp.encryptedFiles,function(encryptedFile){
+            Promises.push(EncryptSrv.decryptFile(encryptedFile,WebApp.getKey()));
+          });
+
+          Promise.all(Promises).then(function(decryptedFiles){
+            WebApp.arrFiles=decryptedFiles;
+            WebApp.currentFile=WebApp.arrFiles[0];
+            WebApp.encryptedFiles=false; //free memory
             WebApp.modals.InsertKeys.close();
-            WebApp.show.decryptLoader=false;
-          },function(r){
+            WebApp.show.seeKeysBtn=true;
+          },function(e){
             var msg='decrypt error. check keys.';
-            if(r!==undefined && r.length){msg=r;}
+            if(e!==undefined && e.length){msg=e;}
             WebApp.errors.decrypt=msg;
           })
           .finally(function(){
+            WebApp.show.headerLoader=false;
             WebApp.show.decryptLoader=false;
             $rootScope.$digest();
           });
         },
+
+        saveAndEncrypt:function(){
+          //encrypt, then save
+          WebApp.show.headerLoader=true;
+          WebApp.show.saveBtn=false;
+          WebApp.show.fileinput=false;
+
+          //create gallery
+          FileSrv.createGallery().then(function(galleryData){
+            WebApp.idGallery=galleryData.data.gallery_id;
+            var Promises=[];
+            angular.forEach(WebApp.arrFiles,function(file){
+              EncryptSrv.encryptFile(file,WebApp.getKey()).then(function(encryptedFile){
+                Promises.push(FileSrv.saveFile(WebApp.idGallery,encryptedFile));
+              });
+            });
+
+            Promise.all(Promises).then(function(prom){
+              WebApp.show.headerLoader=false;
+              WebApp.show.seeKeysBtn=true;
+              WebApp.generateUrl();
+              WebApp.showSeeKeysModal();
+              WebApp.encryptedFiles=false; //free memory
+            });
+          },function(r){
+alert("Can't create gallery. Try again later");
+            WebApp.show.headerLoader=false;
+            WebApp.show.saveBtn=true;
+            WebApp.show.fileinput=true;
+          });
+        },
+
         handleFiles:function(){
             if(!WebApp.currentFile){WebApp.currentFile=WebApp.uploadedFiles[0];}
             angular.forEach(WebApp.uploadedFiles,function(file){
               WebApp.arrFiles.push(file);
             });
             WebApp.uploadedFiles=[];
-/*return;
-
-              WebApp.encryptSelectedFiles().then(function(encryptedFiles){
-                WebApp.encryptedFiles=encryptedFiles;
-                WebApp.show.fileinputLoader=false;
-                WebApp.showSaveBtn=true;
-WebApp.currentAction='done';
-                $rootScope.$digest();
-              });
-
-            });*/
-        },
-        saveFiles:function(){
-            FileSrv.saveFile(JSON.stringify(WebApp.encryptedFiles)).then(function(r){
-                //show url/qr code & passworte
-                WebApp.idResource=r.data.id;
-                WebApp.generateUrl();
-                WebApp.showSaveBtn=false;
-                WebApp.show.seeKeysBtn=true;
-                WebApp.showSeeKeysModal();
-                WebApp.encryptedFiles=false; //free memory
-            });
-        },
-        loadResource:function(id){
-            FileSrv.getFile(id).then(function(r){
-                WebApp.encryptedFiles=JSON.parse(r.data.files);
-                WebApp.showInsertKeysModal();
-            },function(r){
-              //[TODO] handle nonextistent resource
-              console.log('error',r);
-            });
+            WebApp.show.saveBtn=true;
         },
     };
 
     var hash=window.location.hash.split('='); //url.com/#key=HASH
     if(hash.length && hash[1]!==undefined && hash[1].length){
-        WebApp.show.fileinput=false;
-        WebApp.loadResource(hash[1]);
+      WebApp.show.saveBtn=false;
+      WebApp.show.fileinput=false;
+      WebApp.loadGallery(hash[1]);
     }else{
       WebApp.generateKey();
     }
@@ -183,7 +202,7 @@ WebApp.currentAction='done';
 
 .directive('ngFileUploader',function(FileSrv){
   return{
-    scope:{uploadedFiles:"=",},
+    scope:{uploadedFiles:"=",loading:'='},
     link:function(scope, element, attributes){
 
       function saveAsOneFile(fileList){
@@ -202,6 +221,7 @@ WebApp.currentAction='done';
 
 
       element.bind("change", function(e){
+        scope.$apply(function(){scope.loading=true;}); //show loader
         var selectedFiles=e.target.files,
             Promises=[],
             isCollection=true;
@@ -229,6 +249,7 @@ WebApp.currentAction='done';
         Promise.all(Promises).then(function(filesList){
           scope.$apply(function(){
             scope.uploadedFiles=filesList;
+            scope.loading=false; //hide loader
           });
         });
       });

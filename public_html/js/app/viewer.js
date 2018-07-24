@@ -10,11 +10,11 @@ dwv.image.decoderScripts = {
 };
 dwv.gui.displayProgress = function(){};
 dwv.gui.getWindowSize=function(){
-  var h=window.innerHeight-147; if(h<500){h=500;}
+  var h=window.innerHeight-147; /*if(h<500){h=500;}*/
   return {'width':window.innerWidth,'height':h};
 };
 
-WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter){
+WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
   return{
     scope:{arrFiles:"=",currentFile:'='},
     templateUrl:'viewer.html',
@@ -34,6 +34,7 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter){
         activeTool:'Scroll',
         changeTool:changeTool,
         openFile:openFile,
+        showLoader:false,
       };
 
       dwv.gui.DicomTags=function(app){
@@ -66,7 +67,24 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter){
       function openFile(file){scope.currentFile=file;}
 
       function loadFiles(files){
-        scope.dwvApp.reset(); scope.dwvApp.loadURLs(files);
+        ViewerApp.showLoader=true;
+        $timeout(function(){
+          scope.dwvApp.reset();
+          scope.dwvApp.loadURLs(files);
+        },500);
+      }
+
+      function onLoadedFiles(){
+        scope.$apply(function(){
+          ViewerApp.showLoader=false;
+          //disable scroll btn if 1 slice
+          if(scope.currentFile.fileData.length==1){
+            getToolBtn('Scroll').disabled=true;
+            ViewerApp.changeTool({currentTarget:{value:'ZoomAndPan'}});
+          }else{
+            getToolBtn('Scroll').disabled=false;
+          }
+        });
       }
 
       function initApp(){
@@ -87,17 +105,7 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter){
           'isMobile':false
         });
 
-        dwvApp.addEventListener("load-end",function(){
-          scope.$apply(function(){
-            //disable scroll btn if 1 slice
-            if(scope.currentFile.fileData.length==1){
-              getToolBtn('Scroll').disabled=true;
-              ViewerApp.changeTool({currentTarget:{value:'ZoomAndPan'}});
-            }else{
-              getToolBtn('Scroll').disabled=false;
-            }
-          });
-        });
+        dwvApp.addEventListener("load-end",onLoadedFiles);
         scope.dwvApp=dwvApp;
       }
 

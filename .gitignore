@@ -2,3 +2,4 @@ node_modules/*
 public_html/node_modules/*
 nbproject/
 public_html/files/*
+test/*

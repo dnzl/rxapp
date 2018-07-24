@@ -1,4 +1,4 @@
-<div id="app-dwv-viewer">
+<div id="app-dwv-viewer" ng-show="arrFiles.length">
   <nav class="toolbar">
     <div class="wrapper">
       <div ng-repeat="tool in ViewerApp.tools" class="inline">
@@ -24,6 +24,7 @@
     </div>
   </nav>
     <section id="app-content" class="clearfix">
+        <div class="loader-overlay" ng-show="ViewerApp.showLoader"><i class="fas fa-spinner fa-spin"></i></div>
         <article id="app-main" class="split split-horizontal">
           <div class="layerContainer">
 <!--                <div class="dropBox"></div>-->
