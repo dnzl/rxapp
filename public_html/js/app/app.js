@@ -191,7 +191,6 @@ WebApp.currentAction='done';
           id:randomString(),
           name:'N/A',
           type:'',
-          thumbnail:false,
         };
         return new Promise(function(resolve){
           FileSrv.readUploadedFiles(fileList).then(function(fileData){

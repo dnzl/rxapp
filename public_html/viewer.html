@@ -1,4 +1,4 @@
-<div id="dwv">
+<div id="app-dwv-viewer">
   <nav class="toolbar">
     <div class="wrapper">
       <div ng-repeat="tool in ViewerApp.tools" class="inline">
@@ -23,40 +23,34 @@
 -->
     </div>
   </nav>
-    <div class="main wrapper clearfix">
-        <section>
-            <article id="app-main">
-              <div class="layerContainer">
+    <section id="app-content" class="clearfix">
+        <article id="app-main" class="split split-horizontal">
+          <div class="layerContainer">
 <!--                <div class="dropBox"></div>-->
-                <canvas class="imageLayer"></canvas>
-                <!-- <div class="drawDiv"></div>-->
-                <div class="infoLayer">
-                  <div class="infotl"></div><div class="infotc"></div>
-                  <div class="infotr"></div><div class="infocl"></div>
-                  <div class="infocr"></div><div class="infobl"></div>
-                  <div class="infobc"></div>
-                  <div class="infobr" style="bottom: 64px;"></div>
-                </div>
+            <canvas class="imageLayer"></canvas>
+            <!-- <div class="drawDiv"></div>-->
+            <div class="infoLayer">
+              <div class="infotl"></div><div class="infotc"></div>
+              <div class="infotr"></div><div class="infocl"></div>
+              <div class="infocr"></div><div class="infobl"></div>
+              <div class="infobc"></div>
+              <div class="infobr" style="bottom: 64px;"></div>
+            </div>
+          </div>
+        </article>
+
+        <aside id="app-column" class="split split-horizontal">
+            <div class="files-list">
+              <div  id="{{'app-thumb-'+item.id}}" class="app-thumb"
+                    ng-repeat="item in arrFiles"
+                    on-finish-render="renderThumbnailApps"
+                    ng-click="ViewerApp.openFile(item)">
+                  <div class="layerContainer" style="width:100px;height:100px;">
+                    <canvas class="imageLayer"></canvas>
+                  </div>
+                  {{item.name}}
               </div>
-            </article>
-
-            <aside id="app-column" ng-show="ViewerApp.showColumn">
-                <ul class="files-list">
-                    <li ng-repeat="item in arrFiles">
-                      <a ng-click="ViewerApp.openFile(item)">
-                        <img ng-show="item.thumbnail" ng-src="{{item.thumbnail?item.thumbnail:''}}" class="file-thumbnail">
-
-                        <div id="{{'app-thumb-'+item.id}}" ng-show="!item.thumbnail" class="app-thumb">
-                          <div class="layerContainer">
-                            <canvas class="imageLayer"></canvas>
-                          </div>
-                        </div>
-
-                        <br>{{item.name}}
-                      </a>
-                    </li>
-                </ul>
-            </aside>
-        </section>
-    </div>
+            </div><!-- /.files-list -->
+        </aside>
+    </section>
 </div> <!-- #viewer.main-container -->

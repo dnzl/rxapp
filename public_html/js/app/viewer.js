@@ -2,25 +2,25 @@ dwv.utils.decodeQuery = dwv.utils.base.decodeQuery;
 dwv.gui.getElement = dwv.gui.base.getElement;
 dwv.gui.refreshElement = dwv.gui.base.refreshElement;
 dwv.gui.Scroll = dwv.gui.base.Scroll;
-//dwv.gui.DicomTags = dwv.gui.base.DicomTags;
 dwv.gui.postProcessTable = dwv.gui.base.postProcessTable;
 dwv.image.decoderScripts = {
     "jpeg2000": "node_modules/dwv/decoders/pdfjs/decode-jpeg2000.js",
     "jpeg-lossless": "node_modules/dwv/decoders/rii-mango/decode-jpegloss.js",
     "jpeg-baseline": "node_modules/dwv/decoders/pdfjs/decode-jpegbaseline.js"
 };
-
-dwv.gui.displayProgress = function () {};
+dwv.gui.displayProgress = function(){};
 dwv.gui.getWindowSize=function(){
   var h=window.innerHeight-147; if(h<500){h=500;}
   return {'width':window.innerWidth,'height':h};
 };
 
-WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
+WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter){
   return{
     scope:{arrFiles:"=",currentFile:'='},
     templateUrl:'viewer.html',
     link:function(scope, element, attributes){
+
+      Split(['#app-main','#app-column'],{sizes:[70,30]});
 
       var ViewerApp={
         tools:[
@@ -34,15 +34,16 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
         activeTool:'Scroll',
         changeTool:changeTool,
         openFile:openFile,
-        showColumn:true,
       };
 
       dwv.gui.DicomTags=function(app){
         var base = new dwv.gui.base.DicomTags(app);
           this.update = function(tagsData){
-              if(!tagsData || tagsData.length===0){getToolBtn('Tags').disabled=true; return;}
-              getToolBtn('Tags').disabled=false;
-              $rootScope.WebApp.tagsData=tagsData;
+            if(!tagsData || tagsData.length===0){
+              getToolBtn('Tags').disabled=true; return;
+            }
+            getToolBtn('Tags').disabled=false;
+            $rootScope.WebApp.tagsData=tagsData;
           };
       };
 
@@ -62,18 +63,15 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
         scope.dwvApp.onChangeTool(e);
       }
 
-      function openFile(file){
-        scope.currentFile=file;
-      }
+      function openFile(file){scope.currentFile=file;}
 
       function loadFiles(files){
-        scope.dwvApp.reset();
-        scope.dwvApp.loadURLs(files);
+        scope.dwvApp.reset(); scope.dwvApp.loadURLs(files);
       }
 
       function initApp(){
-        scope.dwvApp = new dwv.App();
-        scope.dwvApp.init({
+        var dwvApp = new dwv.App();
+        dwvApp.init({
           'containerDivId': 'app-main',
           'fitToWindow': true,
           "gui": [
@@ -89,8 +87,9 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
           'isMobile':false
         });
 
-        scope.dwvApp.addEventListener("load-end",function(a,b,c){
+        dwvApp.addEventListener("load-end",function(){
           scope.$apply(function(){
+            //disable scroll btn if 1 slice
             if(scope.currentFile.fileData.length==1){
               getToolBtn('Scroll').disabled=true;
               ViewerApp.changeTool({currentTarget:{value:'ZoomAndPan'}});
@@ -99,29 +98,23 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
             }
           });
         });
+        scope.dwvApp=dwvApp;
       }
 
-      scope.thumbs={};
       function createThumbnailApp(file){
-        if(thumbs[file.id]===undefined){
+        if(scope["thumbApp"+file.id]===undefined){
           var app=new dwv.App();
           app.init({"containerDivId": "app-thumb-"+file.id});
-          app.loadURLs(file.fileData);
-          scope.thumbs[file.id]=app;
-console.log(file,file.id,file.fileData,app);
+          app.loadURLs([file.fileData[0]]);
+          scope["thumbApp"+file.id]=app;
         }
-      }
+      };
 
       dwv.i18nOnInitialised(function(){
         dwv.gui.info.overlayMaps=false;
         FileSrv.get(dwv.i18nGetLocalePath("overlays.json")).then(function(r){
           dwv.gui.info.overlayMaps = r.data;
           initApp();
-        },function(e){
-console.log(e);
-        })
-        .catch(function(e){
-console.log(e);
         });
       });
 
@@ -134,18 +127,24 @@ console.log(e);
         }
       });
 
-      scope.$watch('arrFiles',function(data){
-        if(data && !angular.equals(data,{})){
-          $timeout(function(){
-            angular.forEach(scope.arrFiles,function(file){
-              createThumbnailApp(file);
-            });
-          },5000);
-        }
-      },true);
+      scope.$on('renderThumbnailApps', function(ngRepeatFinishedEvent){
+        angular.forEach(scope.arrFiles,function(file){
+          createThumbnailApp(file);
+        });
+      });
       scope.ViewerApp=ViewerApp;
     }
   };
+})
+.directive('onFinishRender',function($timeout){
+  return{
+    restrict: 'A',
+    link:function(scope,element,attr){
+      if(scope.$last===true){
+          $timeout(function(){scope.$emit(attr.onFinishRender);});
+      }
+    }
+  }
 });
 
 
