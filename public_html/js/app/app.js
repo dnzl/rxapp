@@ -41,6 +41,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
           headerLoader:false,
           seeKeysBtn:false,
           saveBtn:false,
+          deleteFile:true,
         },
         errors:{
           default:false, //show on modal
@@ -58,9 +59,10 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         idGallery:false, //id server side to find files
         resourceUrl:'',
         fullUrl:'',
+        baseUrl:location.protocol+'//'+location.host+location.pathname,
         generateUrl:function(){
             WebApp.resourceUrl='#k='+WebApp.idGallery;
-            WebApp.fullUrl=location.protocol+'//'+location.host+location.pathname+WebApp.resourceUrl;
+            WebApp.fullUrl=WebApp.baseUrl+WebApp.resourceUrl;
         },
 //MODALS
         openModal:function(tpl,ctrl){
@@ -101,7 +103,7 @@ getTimeDiff:function(start,now){return (now-start);},
           WebApp.show.headerLoader=true;
           FileSrv.getGallery(idGallery).then(function(r){
             if(r.data.status=='error'){
-              alert("Gallery not found");
+alert("Gallery not found");
               $timeout(function(){
                 window.location.href=location.protocol+'//'+location.host+location.pathname;
               },5000);
@@ -184,6 +186,7 @@ alert("Can't create gallery. Try again later");
     if(hash.length && hash[1]!==undefined && hash[1].length){
       WebApp.show.saveBtn=false;
       WebApp.show.fileinput=false;
+      WebApp.show.deleteFile=false;
       WebApp.loadGallery(hash[1]);
     }else{
       WebApp.generateKey();

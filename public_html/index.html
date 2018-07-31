@@ -23,7 +23,7 @@
         <![endif]-->
 
         <div id="app" ng-controller="BaseCtrl">
-            <div class="header-container">
+            <div id="app-header" class="header-container">
                 <header class="wrapper clearfix">
                     <h1 class="title">Rx</h1>
                     <nav>
@@ -83,14 +83,10 @@
                         </div>
 
                         <div class="form-group">
-                            <input type="text" class="form-control input-passwort" autocomplete="off" disabled="disabled"
-                                    ng-model="WebApp._keyWords[0]"><br>
-                            <input type="text" class="form-control input-passwort" autocomplete="off" disabled="disabled"
-                                    ng-model="WebApp._keyWords[1]"><br>
-                            <input type="text" class="form-control input-passwort" autocomplete="off" disabled="disabled"
-                                    ng-model="WebApp._keyWords[2]"><br>
-                            <input type="text" class="form-control input-passwort" autocomplete="off" disabled="disabled"
-                                    ng-model="WebApp._keyWords[3]">
+                          Password:
+                          <div class="alert-keywords alert alert-info">
+                            <h2>{{WebApp._keyWords.join('-')}}</h2>
+                          </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -106,25 +102,25 @@
                 <div class="modal-header">
                     <h3 class="modal-title" id="modal-insert-keys-title">Insert Keys</h3>
                 </div>
-                  <div class="modal-body">
-                      <div class="form-group">
-                          <input type="password" class="form-control input-passwort" autocomplete="off"
-                                  ng-model="WebApp._keyWords[0]"><br>
-                          <input type="password" class="form-control input-passwort" autocomplete="off"
-                                  ng-model="WebApp._keyWords[1]"><br>
-                          <input type="password" class="form-control input-passwort" autocomplete="off"
-                                  ng-model="WebApp._keyWords[2]"><br>
-                          <input type="password" class="form-control input-passwort" autocomplete="off"
+                  <div class="modal-body form-inline">
+                      <div class="form-group insert-keywords wrapper">
+                          <input type="text" class="form-control input-passwort" autocomplete="off"
+                                  ng-model="WebApp._keyWords[0]"> -
+                          <input type="text" class="form-control input-passwort" autocomplete="off"
+                                  ng-model="WebApp._keyWords[1]"> -
+                          <input type="text" class="form-control input-passwort" autocomplete="off"
+                                  ng-model="WebApp._keyWords[2]"> -
+                          <input type="text" class="form-control input-passwort" autocomplete="off"
                                   ng-model="WebApp._keyWords[3]">
-                      </div>
-                      <div class="alert alert-danger" ng-show="WebApp.errors.decrypt.length">
-                        {{WebApp.errors.decrypt}}
                       </div>
                   </div>
                   <div class="modal-footer">
-                      <!-- close modal -->
-                      <button type="button" class="btn btn-secondary"
-                              ng-click="$modalCtrl.close()">Close</button>
+                    <div class="alert alert-danger wrapper" ng-show="WebApp.errors.decrypt.length">
+                      {{WebApp.errors.decrypt}}
+                    </div>
+
+                      <!-- close modal/go to app index -->
+                      <a class="btn btn-secondary" href="{{WebApp.baseUrl}}">Cancel</a>
 
                       <!-- submit btn -->
                       <button type="submit" class="btn btn-primary"

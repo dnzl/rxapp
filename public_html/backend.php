@@ -29,7 +29,7 @@ try{
   }else
   //create gallery
   if(isset($_GET['c'])){
-    $idGallery=md5(uniqid());
+    $idGallery=substr(md5(uniqid()),0,10);
     $dirname='files/'.$idGallery.'/';
     $i=0;
     while(file_exists($dirname)===true){

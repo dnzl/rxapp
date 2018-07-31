@@ -10,9 +10,12 @@ dwv.image.decoderScripts = {
 };
 dwv.gui.displayProgress = function(){};
 dwv.gui.getWindowSize=function(){
-  var h=window.innerHeight-147; /*if(h<500){h=500;}*/
-  return {'width':window.innerWidth,'height':h};
-};
+  var h=window.innerHeight
+        -document.getElementById('app-header').offsetHeight
+        -document.getElementById('app-toolbar').offsetHeight;
+  var w=document.getElementById('app-main').offsetWidth;
+  return {'width':w,'height':h};
+}
 
 WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
   return{
@@ -20,7 +23,11 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
     templateUrl:'viewer.html',
     link:function(scope, element, attributes){
 
-      Split(['#app-main','#app-column'],{sizes:[70,30]});
+      Split(['#app-main','#app-column'],{
+        sizes:[80,20],
+        minSize:[500,0],
+        gutterSize:7,
+      });
 
       var ViewerApp={
         tools:[
@@ -30,10 +37,13 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
   //        {label:'Draw',value:'Draw',ico:'pencil-alt'},
           {label:'Tags',value:'Tags',ico:'tags'},
           {label:'Info',value:'Info',ico:'info-circle',active:true},
+          {label:'Fullscreen',value:'Fullscreen',ico:'expand-arrows-alt'},
         ],
         activeTool:'Scroll',
+        canDeleteFiles:$rootScope.WebApp.show.deleteFile,
         changeTool:changeTool,
         openFile:openFile,
+        deleteFile:deleteFile,
         showLoader:false,
       };
 
@@ -49,22 +59,56 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
       };
 
       function getToolBtn(toolname){
-        return $filter('filter')(ViewerApp.tools, {value:toolname})[0];
+        return $filter('filter')(ViewerApp.tools,{value:toolname})[0];
+      }
+
+      function openFullscreen(){
+        var elem=document.getElementById('app');
+        if(elem.requestFullscreen){
+          elem.requestFullscreen();
+        }else if (elem.mozRequestFullScreen){ /* Firefox */
+          elem.mozRequestFullScreen();
+        }else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+          elem.webkitRequestFullscreen();
+        }else if (elem.msRequestFullscreen) { /* IE/Edge */
+          elem.msRequestFullscreen();
+        }
+      }
+
+      function closeFullscreen(){
+        if(document.exitFullscreen){
+          document.exitFullscreen();
+        }else if(document.mozCancelFullScreen){ /* Firefox */
+          document.mozCancelFullScreen();
+        }else if(document.webkitExitFullscreen){ /* Chrome, Safari and Opera */
+          document.webkitExitFullscreen();
+        }else if(document.msExitFullscreen){ /* IE/Edge */
+          document.msExitFullscreen();
+        }
       }
 
       function changeTool(e){
-        var val=e.currentTarget.value;
+        var val=e.currentTarget.value,
+            btn=getToolBtn(val);
         if(val=='Tags'){$rootScope.WebApp.showTagsModal();return;}
         if(val=='Info'){
           scope.dwvApp.onToggleInfoLayer();
-          var btn=getToolBtn('Info'); btn.active=!btn.active;
+          btn.active=!btn.active;
           return;
         }
+        if(val=='Fullscreen'){
+          if(!btn.active){openFullscreen();}else{closeFullscreen();}
+          return;
+        }
+
         ViewerApp.activeTool=val;
         scope.dwvApp.onChangeTool(e);
       }
 
       function openFile(file){scope.currentFile=file;}
+      function deleteFile(index){
+        if(ViewerApp.canDeleteFiles){scope.arrFiles.splice(index,1);}
+      }
 
       function loadFiles(files){
         ViewerApp.showLoader=true;
@@ -87,11 +131,22 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
         });
       }
 
+      function fsHandler(event){
+        var fs=(!document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement);
+        getToolBtn('Fullscreen').active=!fs;
+        $rootScope.$apply();
+      }
+
+      document.addEventListener("fullscreenchange",fsHandler,false);
+      document.addEventListener("webkitfullscreenchange",fsHandler,false);
+      document.addEventListener("mozfullscreenchange",fsHandler,false);
+      document.addEventListener("MSFullscreenChange",fsHandler,false);
+
       function initApp(){
         var dwvApp = new dwv.App();
         dwvApp.init({
           'containerDivId': 'app-main',
-          'fitToWindow': true,
+          'fitToWindow':true,
           "gui": [
 //            "tool",
 //              "load",
