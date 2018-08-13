@@ -21,7 +21,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
 
  //[TODO] buscar una mejor forma de handlear dmw's errors -.-
   window.alert = function(msg){
-    WebApp.openModal('ModalDefaultMsg.html');
+    WebApp.openModal('default-msg.html');
     WebApp.modalMsg.error=msg;
   };
   /*
@@ -68,7 +68,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         openModal:function(tpl,ctrl){
             var ctrl = ctrl || 'ModalDefaultCtrl';
             return $uibModal.open({
-                templateUrl:tpl,
+                templateUrl:'modals/'+tpl,
                 controller:ctrl,
                 controllerAs:'$modalCtrl',
                 size:'lg',
@@ -83,14 +83,14 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
           Tags:false,
         },
         showInsertKeysModal:function(){
-            WebApp.modals.InsertKeys=WebApp.openModal('ModalInsertKeys.html');
+            WebApp.modals.InsertKeys=WebApp.openModal('insert-keys.html');
         },
         showSeeKeysModal:function(){
-            WebApp.modals.ShowKeys=WebApp.openModal('ModalShowKeys.html');
+            WebApp.modals.ShowKeys=WebApp.openModal('show-keys.html');
         },
         tagsData:'',
         showTagsModal:function(){
-            WebApp.modals.Tags=WebApp.openModal('ModalTags.html');
+            WebApp.modals.Tags=WebApp.openModal('tags.html');
         },
 getTimeDiff:function(start,now){return (now-start);},
 //ENCRYPTION
@@ -98,30 +98,37 @@ getTimeDiff:function(start,now){return (now-start);},
         getKey:function(){return WebApp._keyWords.join(' ');},
         generateKey:function(){WebApp._keyWords=xkcd_pw_gen();},
         loadGallery:function(idGallery){
+          WebApp.currentAction='loading files...';
           WebApp.idGallery=idGallery;
           WebApp.generateUrl();
           WebApp.show.headerLoader=true;
           FileSrv.getGallery(idGallery).then(function(r){
             if(r.data.status=='error'){
-alert("Gallery not found");
+              alert("Gallery not found. You'll be redirected.");
               $timeout(function(){
                 window.location.href=location.protocol+'//'+location.host+location.pathname;
               },5000);
               return;
             }
+            WebApp.currentAction='';
             WebApp.encryptedFiles=r.data.files;
             WebApp.showInsertKeysModal();
           },function(e){
-alert('Unable to load gallery',e);
+            alert('Unable to load gallery',e);
           });
         },
         decryptFiles:function(){
+          WebApp.currentAction='checkin password...';
           WebApp.errors.decrypt='';
           WebApp.show.decryptLoader=true;
           var Promises=[];
           angular.forEach(WebApp.encryptedFiles,function(encryptedFile){
             Promises.push(EncryptSrv.decryptFile(encryptedFile,WebApp.getKey()));
           });
+
+          $timeout(function(){
+            if(WebApp.currentAction!=''){WebApp.currentAction='decrypting files...'; }
+          },2000);
 
           Promise.all(Promises).then(function(decryptedFiles){
             WebApp.arrFiles=decryptedFiles;
@@ -137,6 +144,7 @@ alert('Unable to load gallery',e);
           .finally(function(){
             WebApp.show.headerLoader=false;
             WebApp.show.decryptLoader=false;
+            WebApp.currentAction='';
             $rootScope.$digest();
           });
         },
@@ -165,7 +173,7 @@ alert('Unable to load gallery',e);
               WebApp.encryptedFiles=false; //free memory
             });
           },function(r){
-alert("Can't create gallery. Try again later");
+            alert("Can't create gallery. Try again later");
             WebApp.show.headerLoader=false;
             WebApp.show.saveBtn=true;
             WebApp.show.fileinput=true;

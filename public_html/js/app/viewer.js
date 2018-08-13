@@ -32,7 +32,12 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
       var ViewerApp={
         tools:[
           {label:'Scroll',value:'Scroll',ico:'clone'},
-          {label:'Zoom/Pan',value:'ZoomAndPan',ico:'search-plus'},
+          {
+            label:'Zoom/Pan',value:'ZoomAndPan',ico:'search-plus',
+            options:[
+              {label:'Reset',fn:resetZoom}
+            ],
+          },
           {label:'Levels',value:'WindowLevel',ico:'signal'},
   //        {label:'Draw',value:'Draw',ico:'pencil-alt'},
           {label:'Tags',value:'Tags',ico:'tags'},
@@ -45,7 +50,10 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
         openFile:openFile,
         deleteFile:deleteFile,
         showLoader:false,
+        resetZoom:resetZoom,
       };
+
+      function resetZoom(){scope.dwvApp.onZoomReset();};
 
       dwv.gui.DicomTags=function(app){
         var base = new dwv.gui.base.DicomTags(app);

@@ -6,20 +6,38 @@
                 ng-class="{'active':ViewerApp.activeTool==tool.value || tool.active}"
                 ng-value="tool.value"
                 ng-click="ViewerApp.changeTool($event)"
-                ng-disabled="tool.disabled">
+                ng-disabled="tool.disabled"
+                ng-show="!tool.options">
                 <i class="fas fa-{{tool.ico}}"></i> {{tool.label}}
         </button>
+
+        <div class="btn-group" uib-dropdown ng-show="tool.options">
+          <button class="btn btn-default btn-sm"
+                  ng-class="{'active':ViewerApp.activeTool==tool.value || tool.active}"
+                  ng-value="tool.value"
+                  ng-click="ViewerApp.changeTool($event)"
+                  ng-disabled="tool.disabled">
+                  <i class="fas fa-{{tool.ico}}"></i> {{tool.label}}
+          </button>
+          <button type="button" class="btn btn-default btn-sm" uib-dropdown-toggle>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" uib-dropdown-menu>
+            <li ng-repeat="opt in tool.options">
+              <a class="btn btn-sm"
+                      ng-click="opt.fn()"
+                      ng-disabled="opt.disabled">
+                      <i class="fas fa-{{opt.ico}}"></i> {{opt.label}}
+              </a>
+            </li>
+          </ul>
+        </div>
+
+
+
       </div>
       <!--
-      <div class="btn-group" uib-dropdown>
-        <button type="button" class="btn btn-default btn-sm" value="WindowLevel" ng-click="changeTool($event)"><i class="fas fa-signal"></i> Levels</button>
-        <button type="button" class="btn btn-default btn-sm" uib-dropdown-toggle>
-          <span class="caret"></span>
-        </button>
-        <div class="dropdown-menu" uib-dropdown-menu>
-          abc
-        </div>
-      </div>
+
 -->
     </div>
   </nav>
@@ -41,7 +59,6 @@
         </article>
 
         <aside id="app-column" class="split-flex split-horizontal-flex">
-<!--
             <div class="files-list">
               <div  id="{{'app-thumb-'+item.id}}" class="app-thumb"
                     ng-repeat="item in arrFiles"
