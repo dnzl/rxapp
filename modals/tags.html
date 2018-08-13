@@ -1,0 +1,28 @@
+
+    <div class="modal-header">
+        <h3 class="modal-title" id="modal-tags-title">Tags</h3>
+        <span>
+          <input type="text" class="form-control"
+                placeholder="Search tags..."
+                ng-model="searchTags">
+        </span>
+    </div>
+    <div class="modal-body modal-tags">
+      <table class="table table-sm table-striped table-responsive-lg">
+        <thead>
+          <tr>
+            <th scope="col">Label</th>
+            <th scope="col">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="tag in WebApp.tagsData | filter:searchTags">
+            <td>{{tag.name}}</td>
+            <td>{{tag.value}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" ng-click="$modalCtrl.close()">Close</button>
+    </div>

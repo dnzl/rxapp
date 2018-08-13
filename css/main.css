@@ -1,0 +1,354 @@
+/*! HTML5 Boilerplate v5.0 | MIT License | http://h5bp.com/ */
+
+html {
+    color: #222;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+audio,
+canvas,
+iframe,
+img,
+svg,
+video {
+    vertical-align: middle;
+}
+
+fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.browserupgrade {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+
+/* ===== Initializr Styles ==================================================
+   Author: Jonathan Verrecchia - verekia.com/initializr/responsive-template
+   ========================================================================== */
+
+body {
+    font: 16px/26px Helvetica, Helvetica Neue, Arial;
+}
+
+.wrapper {
+    width: 90%;
+    margin: 0 5%;
+}
+
+/* ===================
+    ALL: Orange Theme
+   =================== */
+
+.title {
+    color: white;
+}
+
+/* ==============
+    MOBILE: Menu
+   ============== */
+
+header nav{padding:10px; text-align:right;}
+
+
+
+/* ===============
+    ALL: IE Fixes
+   =============== */
+
+.ie7 .title {
+    padding-top: 20px;
+}
+
+/* ==========================================================================
+Viewer
+   ========================================================================== */
+a{cursor:pointer;}
+body{background:#151515;}
+h1{font-size:2em;vertical-align:middle;}
+header nav{padding:5px 25px 5px 10px; position:relative;}
+.header-container{background-color:#333;}
+.header-loader{position:absolute; top:8px; right:0; color:#fff;}
+.inline{display:inline;}
+.btn-default:not(:disabled):not(.disabled).active,
+.btn-default:not(:disabled):not(.disabled):active{
+  color:#fff; background-color:#555; border-color:#999; box-shadow:#000 inset 0 0 3px 1px;
+}
+.current-action{color:#fff;font-size:.8em;}
+#app-main{padding:0;position:relative;}
+#app-main .layerContainer{width:100%;}
+#app-main .layerContainer .imageLayer{}
+#app-column{padding:0;background: #333;color:#fff;}
+.files-list{padding:5px 10px;}
+.app-thumb{cursor:pointer; display:inline-block;margin:5px;font-size:.7em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border:#666 solid 1px;padding:5px 7px 0px;}
+.app-thumb:hover{opacity:.75;}
+.app-thumb .layerContainer{margin:0;}
+
+.open > .dropdown-menu{display:block;}
+.open > a {outline:0;}
+.toolbar{ background:#555; padding:6px; box-shadow:#000 0px 0px 5px 1px inset;}
+.btn-group>.btn:first-child{margin-right:0;padding-right:5px;}
+.btn-group>.btn:not(:first-child){padding-left:0;}
+
+/* #app-content{position:relative;display:table;width:100%;}
+#app-main,#app-column,.gutter{display:table-cell;} */
+#app-content{display:flex;}
+#app-main,#app-column{}
+.loader-overlay{position:absolute; background:rgba(0,0,0,.5); top:0; left:0; bottom:0; right:0; z-index:999; font-size:5em; color:#999; line-height:5em; text-align:center;}
+.layerContainer { position: relative; padding: 0;margin:auto; }
+.imageLayer { position: absolute; }
+.drawDiv { position: absolute; pointer-events: none; }
+
+.infoLayer{color:#fff; font-size:.8em;line-height: normal;}
+.infoLayer ul { margin: 0; padding: 2px; list-style-type: none; }
+.infoLayer li { margin-top: 0; }
+.infoLayer canvas { margin: 0; padding: 2px; }
+.info { color: #cde; text-shadow: 1px 1px #000; font-size: 80%; }
+.infoc { color: #ff0; text-shadow: 1px 1px #000; font-size: 120%; }
+.infotl { position: absolute; top: 0; left: 0; text-align: left; text-shadow: 0 1px 0 #000; }
+.infotc { position: absolute; top: 0; left: 50%; right: 50%; text-align: center; text-shadow: 0 1px 0 #000; }
+.infotr { position: absolute; top: 0; right: 0; text-align: right; text-shadow: 0 1px 0 #000; }
+.infocl { position: absolute; bottom: 50%; left: 0; text-align: left; text-shadow: 0 1px 0 #000; }
+.infocr { position: absolute; bottom: 50%; right: 2px; text-align: right; text-shadow: 0 1px 0 #000; }
+.infobl { position: absolute; bottom: 0; left: 0; text-align: left; text-shadow: 0 1px 0 #000; }
+.infobc { position: absolute; bottom: 0; left: 50%; right: 50%; text-align: center; text-shadow: 0 1px 0 #000; }
+.infobr { position: absolute; bottom: 0; right: 0; text-align: right; text-shadow: 0 1px 0 #000; }
+
+
+.modal-content{background-color:#444;color:#fff;}
+.modal-header{border-bottom-color:#666;}
+.table-striped tbody tr:nth-of-type(even){background-color:rgba(0,0,0,.3)}
+.table thead{background-color:#222;}
+.modal-tags.modal-body{max-height:70vh;overflow:auto;}
+
+/* drag&drop */
+.dropBox {
+   border: 5px dashed #ccc;
+   margin: auto; text-align: center }
+.dropBox.hover { border: 5px dashed #cc0; }
+
+
+.split p, .split-flex p {padding: 20px;}
+.split, .split-flex {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.gutter {background-color: #666;box-shadow:#000 0px 0px 2px 0px inset;}
+.gutter.gutter-horizontal{cursor: ew-resize;}
+.gutter.gutter-vertical{cursor: ns-resize;}
+.split.split-horizontal, .gutter.gutter-horizontal {float:left;}
+.delete-file{float:right;}
+.delete-file:hover{color:#bd2130 !important;}
+.alert-keywords{text-align:center; margin:10px 20px;}
+.input-passwort{width:23%; margin:10px 0.5%;}
+.insert-keywords{margin:10px 0;}
+
+
+
+
+/* ==========================================================================
+   Media Queries
+   ========================================================================== */
+
+@media (min-width: 576px){
+ .form-inline .form-control.input-passwort{width:23%;}
+}
+
+
+@media only screen and (min-width: 480px) {
+}
+
+@media only screen and (min-width: 768px) {
+
+/* ============
+    WIDE: Menu
+   ============ */
+
+    .title {
+        float: left;
+    }
+
+    header nav {
+        float: right;
+        width: 38%;
+    }
+
+}
+
+@media only screen and (min-width: 1140px) {
+
+/* ===============
+    Maximal Width
+   =============== */
+
+    .wrapper {
+/*        width: 1026px; /* 1140px - 10% for margins */
+        margin: 0 auto;
+    }
+}
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+.hidden {
+    display: none !important;
+    visibility: hidden;
+}
+
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.visuallyhidden.focusable:active,
+.visuallyhidden.focusable:focus {
+    clip: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.clearfix {
+    *zoom: 1;
+}
+
+/* ==========================================================================
+   Print styles
+   ========================================================================== */
+
+@media print {
+    *,
+    *:before,
+    *:after {
+        background: transparent !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    a[href^="#"]:after,
+    a[href^="javascript:"]:after {
+        content: "";
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}
+
+/* Chrome, Safari and Opera syntax */
+#app:-webkit-full-screen {
+  height:100%;
+  width:100%;
+  background:#151515;
+}
+
+/* Firefox syntax *
+#app:-moz-full-screen {
+  background-color: yellow;
+}
+
+/* IE/Edge syntax *
+#app:-ms-fullscreen {
+  background-color: yellow;
+}
+
+/* Standard syntax */
+#app:fullscreen {
+  background-color: yellow;
+}

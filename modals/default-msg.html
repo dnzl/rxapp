@@ -1,0 +1,12 @@
+<form>
+  <div class="modal-body">
+      <div class="alert alert-danger" ng-show="WebApp.modalMsg.error.length">
+        {{WebApp.modalMsg.error}}
+      </div>
+  </div>
+  <div class="modal-footer">
+      <!-- close modal -->
+      <button type="button" class="btn btn-secondary"
+              ng-click="$modalCtrl.close()">Close</button>
+  </div>
+</form>

@@ -1,0 +1,80 @@
+<div id="app-dwv-viewer" ng-show="arrFiles.length">
+  <nav id="app-toolbar" class="toolbar">
+    <div class="wrapper">
+      <div ng-repeat="tool in ViewerApp.tools" class="inline">
+        <button class="btn btn-default btn-sm"
+                ng-class="{'active':ViewerApp.activeTool==tool.value || tool.active}"
+                ng-value="tool.value"
+                ng-click="ViewerApp.changeTool($event)"
+                ng-disabled="tool.disabled"
+                ng-show="!tool.options">
+                <i class="fas fa-{{tool.ico}}"></i> {{tool.label}}
+        </button>
+
+        <div class="btn-group" uib-dropdown ng-show="tool.options">
+          <button class="btn btn-default btn-sm"
+                  ng-class="{'active':ViewerApp.activeTool==tool.value || tool.active}"
+                  ng-value="tool.value"
+                  ng-click="ViewerApp.changeTool($event)"
+                  ng-disabled="tool.disabled">
+                  <i class="fas fa-{{tool.ico}}"></i> {{tool.label}}
+          </button>
+          <button type="button" class="btn btn-default btn-sm" uib-dropdown-toggle>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" uib-dropdown-menu>
+            <li ng-repeat="opt in tool.options">
+              <a class="btn btn-sm"
+                      ng-click="opt.fn()"
+                      ng-disabled="opt.disabled">
+                      <i class="fas fa-{{opt.ico}}"></i> {{opt.label}}
+              </a>
+            </li>
+          </ul>
+        </div>
+
+
+
+      </div>
+      <!--
+
+-->
+    </div>
+  </nav>
+    <section id="app-content" class="clearfix">
+        <div class="loader-overlay" ng-show="ViewerApp.showLoader"><i class="fas fa-spinner fa-spin"></i></div>
+        <article id="app-main" class="split-flex split-horizontal-flex">
+          <div class="layerContainer">
+<!--                <div class="dropBox"></div>-->
+            <canvas class="imageLayer"></canvas>
+            <!-- <div class="drawDiv"></div>-->
+          </div>
+          <div class="infoLayer">
+            <div class="infotl"></div><div class="infotc"></div>
+            <div class="infotr"></div><div class="infocl"></div>
+            <div class="infocr"></div><div class="infobl"></div>
+            <div class="infobc"></div>
+            <div class="infobr" style="bottom: 64px;"></div>
+          </div>
+        </article>
+
+        <aside id="app-column" class="split-flex split-horizontal-flex">
+            <div class="files-list">
+              <div  id="{{'app-thumb-'+item.id}}" class="app-thumb"
+                    ng-repeat="item in arrFiles"
+                    on-finish-render="renderThumbnailApps">
+                  <div class="layerContainer" style="width:100px;height:100px;"
+                        ng-click="ViewerApp.openFile(item)">
+                    <canvas class="imageLayer"></canvas>
+                  </div>
+                  <a ng-click="ViewerApp.openFile(item)">{{item.name}}</a>
+                  <a  class="delete-file"
+                      ng-show="ViewerApp.canDeleteFiles"
+                      ng-click="ViewerApp.deleteFile($index)">
+                    <i class="fas fa-trash"></i>
+                  </a>
+              </div>
+            </div><!-- /.files-list -->
+        </aside>
+    </section>
+</div> <!-- #viewer.main-container -->
