@@ -4,9 +4,9 @@ dwv.gui.refreshElement = dwv.gui.base.refreshElement;
 dwv.gui.Scroll = dwv.gui.base.Scroll;
 dwv.gui.postProcessTable = dwv.gui.base.postProcessTable;
 dwv.image.decoderScripts = {
-    "jpeg2000": "vendor/dwv/decoders/pdfjs/decode-jpeg2000.js",
-    "jpeg-lossless": "vendor/dwv/decoders/rii-mango/decode-jpegloss.js",
-    "jpeg-baseline": "vendor/dwv/decoders/pdfjs/decode-jpegbaseline.js"
+    "jpeg2000": "js/vendor/dwv/decoders/pdfjs/decode-jpeg2000.js",
+    "jpeg-lossless": "js/vendor/dwv/decoders/rii-mango/decode-jpegloss.js",
+    "jpeg-baseline": "js/vendor/dwv/decoders/pdfjs/decode-jpegbaseline.js"
 };
 dwv.gui.displayProgress = function(){};
 dwv.gui.getWindowSize=function(){
@@ -190,7 +190,7 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
       });
 
       dwv.browser.check();
-      dwv.i18nInitialise("auto", "vendor/dwv");
+      dwv.i18nInitialise("auto", "js/vendor/dwv");
 
       scope.$watch('currentFile',function(data){
         if(data && !angular.equals(data,{})){
