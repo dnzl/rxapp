@@ -1,6 +1,3 @@
 [submodule "vendor/dwv"]
 	path = vendor/dwv
 	url = https://github.com/ivmartel/dwv.git
-[submodule "vendor/angular-ui-bootstrap"]
-	path = vendor/angular-ui-bootstrap
-	url = https://github.com/angular-ui/bootstrap.git
