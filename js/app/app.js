@@ -106,7 +106,7 @@ getTimeDiff:function(start,now){return (now-start);},
             if(r.data.status=='error'){
               alert("Gallery not found. You'll be redirected.");
               $timeout(function(){
-                window.location.href=location.protocol+'//'+location.host+location.pathname;
+//                window.location.href=location.protocol+'//'+location.host+location.pathname;
               },5000);
               return;
             }

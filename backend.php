@@ -4,39 +4,51 @@ ini_set('max_execution_time', '999');
 ini_set('memory_limit', '512M');
 ini_set('post_max_size', '200M');
 
-function writeFile($filepath,$content){
-  $fp=fopen($filepath,"w");
-  fwrite($fp,$content);
-  fclose($fp);
-}
+// Include the SDK using the Composer autoloader
+//date_default_timezone_set('America/Los_Angeles');
+require 'vendor/autoload.php';
+use Aws\S3\S3Client;
+
+$s3 = new Aws\S3\S3Client([
+        'version' => 'latest',
+        'region'  => 'eu-west',
+        'endpoint' => 'http://localhost:9000',
+        'use_path_style_endpoint' => true,
+        'credentials' => [
+                'key'    => 'AVDUIBUV4SWF37QWE0SC',
+                'secret' => 'e6XEu0DP2LqqFzUeyEOQ0Lzssqtdez+cM1Rjj1Ps',
+            ],
+]);
+
+$bucket='rxapp';
+
 
 try{
   //get gallery
   if(isset($_GET['gallery_id'])){
     $idGallery=$_GET['gallery_id'];
-    $dirname='files/'.$idGallery.'/';
-    $arrFiles=array_diff(scandir($dirname),array('.', '..'));
-    if(!$arrFiles){throw new \Exception("Gallery not found");}
-    $out=[];
 
-    foreach($arrFiles as $file){
-      $out[]=file_get_contents($dirname.$file);
+    $objects = $s3->getIterator('ListObjects', array(
+      "Bucket" => $bucket,
+      "Prefix" =>$idGallery.'/'
+    ));
+    $arrFiles=[];
+    foreach ($objects as $object) {
+      $file=$s3->getObject([
+           'Bucket' => $bucket,
+           'Key'    => $object['Key'],
+           'ResponseContentType'=>'text/plain'
+      ]);
+      $arrFiles[]=(string)$file['Body'];
     }
     $result=array(
       "status"=>'success',
-      "files"=>$out,
+      "files"=>$arrFiles,
     );
   }else
   //create gallery
   if(isset($_GET['c'])){
     $idGallery=substr(md5(uniqid()),0,10);
-    $dirname='files/'.$idGallery.'/';
-    $i=0;
-    while(file_exists($dirname)===true){
-      $idGallery=md5(uniqid()); $dirname='files/'.$idGallery.'/';
-      if(++$i>500){throw new Exception("Can't create gallery");}
-    }
-    mkdir($dirname);
     $result=array(
       'status'=>'success',
       'gallery_id'=>$idGallery,
@@ -51,12 +63,18 @@ try{
     if(!$request || !$request->file){throw new \Exception("File could not be saved");}
     if(!$request->gallery_id){throw new \Exception("Unknown gallery");}
     $idGallery=$request->gallery_id;
-    writeFile("files/".$idGallery.'/'.$idFile,$request->file);
+
+    $insert = $s3->putObject([
+         'Bucket' =>$bucket,
+         'Key'    => $idGallery.'/'.$idFile,
+         'Body'   => $request->file
+    ]);
 
     $result=array(
       "status"=>'success',
       "gallery_id"=>$idGallery,
       "file_id"=>$idFile,
+      'i'=>var_export($insert,true)
     );
   }
 }catch(Exception $e){
