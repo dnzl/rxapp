@@ -158,19 +158,23 @@ getTimeDiff:function(start,now){return (now-start);},
           //create gallery
           FileSrv.createGallery().then(function(galleryData){
             WebApp.idGallery=galleryData.data.gallery_id;
-            var Promises=[];
+            var EncPromises=[],SavePromises=[];
             angular.forEach(WebApp.arrFiles,function(file){
-              EncryptSrv.encryptFile(file,WebApp.getKey()).then(function(encryptedFile){
-                Promises.push(FileSrv.saveFile(WebApp.idGallery,encryptedFile));
-              });
+              EncPromises.push(EncryptSrv.encryptFile(file,WebApp.getKey()));
             });
 
-            Promise.all(Promises).then(function(prom){
-              WebApp.show.headerLoader=false;
-              WebApp.show.seeKeysBtn=true;
-              WebApp.generateUrl();
-              WebApp.showSeeKeysModal();
-              WebApp.encryptedFiles=false; //free memory
+            Promise.all(EncPromises).then(function(arrEnc){
+              angular.forEach(arrEnc,function(encryptedFile){
+                SavePromises.push(FileSrv.saveFile(WebApp.idGallery,encryptedFile));
+              });
+
+              Promise.all(SavePromises).then(function(prom){
+                WebApp.show.headerLoader=false;
+                WebApp.show.seeKeysBtn=true;
+                WebApp.generateUrl();
+                WebApp.showSeeKeysModal();
+                WebApp.encryptedFiles=false;
+              });
             });
           },function(r){
             alert("Can't create gallery. Try again later");
