@@ -5,20 +5,21 @@ ini_set('memory_limit', '512M');
 ini_set('post_max_size', '200M');
 
 // Include the SDK using the Composer autoloader
-//date_default_timezone_set('America/Los_Angeles');
+date_default_timezone_set('UTC');
 require 'vendor/autoload.php';
 use Aws\S3\S3Client;
 
-$_endpoint='https://storage.werpo.com.ar/';
-$_key='JQ9RVJ43RX3I6YFWFCNH';
-$_secret='XvuXg4zLCZb65GFv5xQUEG7tKQ7EaseTLwyJ1gw2';
+$_endpoint='https://storage.werpo.com.ar';
+$_key='FXXGKVBAEVEHSYGPYYX0';
+$_secret='1fyNeLCT5GS9X92r2vWdv3gx10FlaW5RlAey';
 $_bucket='rxapp';
 
 $s3 = new Aws\S3\S3Client([
         'version' => 'latest',
-        'region'  => 'eu-west',
+        'region'  => 'us-east-1',
+        'signature_version' => 'v4',
         'endpoint' => $_endpoint,
-        'use_path_style_endpoint' =>true,
+        'use_path_style_endpoint' => true,
         'credentials' => [
                 'key'    =>$_key,
                 'secret' =>$_secret,
@@ -35,6 +36,7 @@ try{
       "Bucket" => $_bucket,
       "Prefix" =>$idGallery.'/'
     ));
+    
     $arrFiles=[];
     foreach ($objects as $object) {
       $file=$s3->getObject([
