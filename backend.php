@@ -9,18 +9,21 @@ ini_set('post_max_size', '200M');
 require 'vendor/autoload.php';
 use Aws\S3\S3Client;
 
+$_endpoint='https://storage.werpo.com.ar/';
+$_key='JQ9RVJ43RX3I6YFWFCNH';
+$_secret='XvuXg4zLCZb65GFv5xQUEG7tKQ7EaseTLwyJ1gw2';
+$_bucket='rxapp';
+
 $s3 = new Aws\S3\S3Client([
         'version' => 'latest',
         'region'  => 'eu-west',
-        'endpoint' => 'http://localhost:9000',
-        'use_path_style_endpoint' => true,
+        'endpoint' => $_endpoint,
+        'use_path_style_endpoint' =>true,
         'credentials' => [
-                'key'    => 'AVDUIBUV4SWF37QWE0SC',
-                'secret' => 'e6XEu0DP2LqqFzUeyEOQ0Lzssqtdez+cM1Rjj1Ps',
+                'key'    =>$_key,
+                'secret' =>$_secret,
             ],
 ]);
-
-$bucket='rxapp';
 
 
 try{
@@ -29,13 +32,13 @@ try{
     $idGallery=$_GET['gallery_id'];
 
     $objects = $s3->getIterator('ListObjects', array(
-      "Bucket" => $bucket,
+      "Bucket" => $_bucket,
       "Prefix" =>$idGallery.'/'
     ));
     $arrFiles=[];
     foreach ($objects as $object) {
       $file=$s3->getObject([
-           'Bucket' => $bucket,
+           'Bucket' => $_bucket,
            'Key'    => $object['Key'],
            'ResponseContentType'=>'text/plain'
       ]);
@@ -65,7 +68,7 @@ try{
     $idGallery=$request->gallery_id;
 
     $insert = $s3->putObject([
-         'Bucket' =>$bucket,
+         'Bucket' =>$_bucket,
          'Key'    => $idGallery.'/'.$idFile,
          'Body'   => $request->file
     ]);
