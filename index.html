@@ -50,19 +50,28 @@
                              uploaded-files="WebApp.uploadedFiles"
                              loading="WebApp.show.headerLoader">
 
-                      <!-- demo btn -->
-                       <button  ng-click="WebApp.demo()"
+                      <!-- demo btn --
+                       <button  ng-click="WebApp.startDemo()"
                                 ng-show="WebApp.show.demoBtn"
                                 class="btn btn-info btn-sm">
                          <i class="fas fa-eye"></i> Demo
                        </button>
                        &nbsp;
+                       <!-- /demo btn -->
                       <!-- select files btn -->
                        <button onclick="document.getElementById('input-file').click()"
                                class="btn btn-secondary btn-sm"
                                ng-show="WebApp.show.fileinput">
                            <i class="fas fa-upload"></i> Select files
                        </button>
+
+                       <!-- help btn -->
+                        <button  class="btn btn-link btn-sm"
+                                 ng-click="WebApp.showHelpModal()">
+                          <i class="fas fa-info-circle text-muted"></i>
+                        </button>
+                        &nbsp;
+
                         <!-- loader -->
                         <div ng-show="WebApp.show.headerLoader" class="header-loader">
                             <i class="fas fa-spinner fa-spin"></i>

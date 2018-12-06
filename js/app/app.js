@@ -100,6 +100,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
           InsertKeys:false,
           ShowKeys:false,
           Tags:false,
+          Help:false,
         },
         showInsertKeysModal:function(){
             WebApp.modals.InsertKeys=WebApp.openModal('insert-keys.html');
@@ -107,11 +108,23 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         showSeeKeysModal:function(){
             WebApp.modals.ShowKeys=WebApp.openModal('show-keys.html');
         },
+        showHelpModal:function(){
+            WebApp.modals.Help=WebApp.openModal('help.html');
+        },
         tagsData:'',
         showTagsModal:function(){
             WebApp.modals.Tags=WebApp.openModal('tags.html');
         },
         getTimeDiff:function(start,now){return (now-start);},
+
+        tutorialMode:false,
+        startTutorial:function(){
+          WebApp.tutorialMode=true;
+          if(WebApp.arrFiles.length==0 && !WebApp.demoMode && !WebApp.disabledDemo){
+            WebApp.startDemo();
+          }
+        },
+
 //ENCRYPTION
         _keyWords:[],
         getKey:function(){return WebApp._keyWords.join(' ');},
@@ -209,6 +222,8 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
             WebApp.arrFiles=[];
           }
           WebApp.disableDemo();
+          WebApp.tutorialMode=false;
+
           if(!WebApp.currentFile){WebApp.currentFile=WebApp.uploadedFiles[0];}
           angular.forEach(WebApp.uploadedFiles,function(file){
             WebApp.arrFiles.push(file);
@@ -217,8 +232,9 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
           WebApp.show.saveBtn=true;
         },
 
+        demoDisabled:false,
         demoMode:false,
-        demo:function(){
+        startDemo:function(){
           WebApp.demoMode=true;
           WebApp.show.demoBtn=false;
           var demoData=[];
@@ -235,6 +251,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         },
         disableDemo:function(){
           WebApp.demoMode=false;
+          WebApp.demoDisabled=true;
           WebApp.show.demoBtn=false;
           WebApp.show.deleteFile=true;
         },
@@ -317,6 +334,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         if(isCollection){Promises.push(saveAsOneFile(selectedFiles));}
 
         Promise.all(Promises).then(function(filesList){
+console.log(filesList);
           scope.$apply(function(){
             scope.uploadedFiles=filesList;
             scope.loading=false; //hide loader

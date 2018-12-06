@@ -1,0 +1,23 @@
+<div class="modal-body">
+  <p>This is a web-based viewer and encrypter for DICOM files.</p>
+  <p>It uses <a href="https://github.com/ivmartel/dwv" target="_blank">DWV (DICOM Web Viewer)</a>, which is an open source zero footprint medical image viewer.</p>
+  <p>Upon saving all files are encrypted client-side using <a href="https://github.com/brix/crypto-js" target="_blank">CryptoJS</a>, then saved in an AWS-like environment.</p>
+  <p>
+    Click <strong>Start tutorial</strong> below to start a walkthrough
+    <span ng-show="!WebApp.demoDisabled">with a demo file</span>
+    and learn how to use this thing!
+  </p>
+  <div class="alert alert-secondary small">
+    <i class="fas fa-exclamation-circle mr-1"></i> This web-app is just an exercise, full of bugs and by no means intended to be used for realsies!<br>
+    <strong class="ml-4">Beware! All uploaded files can be deleted at any time!</strong>
+  </div>
+</div>
+<div class="modal-footer">
+    <!-- start tutorial -->
+    <button type="button" class="btn btn-primary"
+            ng-disabled="WebApp.tutorialMode"
+            ng-click="$modalCtrl.close(); WebApp.startTutorial();">Start tutorial</button>
+    <!-- close modal -->
+    <button type="button" class="btn btn-secondary"
+            ng-click="$modalCtrl.close()">Close</button>
+</div>
