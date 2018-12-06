@@ -10460,7 +10460,7 @@ dwv.gui.base.Threshold = function (app)
         if (flag) {
             slider.initialise();
         }
-        
+
         var node = app.getElement("thresholdLi");
         dwv.html.displayElement(node, flag);
     };

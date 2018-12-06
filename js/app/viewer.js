@@ -51,6 +51,7 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
         deleteFile:deleteFile,
         showLoader:false,
         resetZoom:resetZoom,
+        thumbApps:[],
       };
 
       function resetZoom(){scope.dwvApp.onZoomReset();};
@@ -115,8 +116,14 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
 
       function openFile(file){scope.currentFile=file;}
       function deleteFile(index){
-        if(ViewerApp.canDeleteFiles){scope.arrFiles.splice(index,1);}
-        if(scope.arrFiles.length==0){scope.currentFile=false;}
+        if(ViewerApp.canDeleteFiles){
+          deleteThumbApp(scope.arrFiles[index].id);
+          scope.arrFiles.splice(index,1);
+        }
+        if(scope.arrFiles.length==0){
+          scope.currentFile=false;
+          scope.dwvApp.reset();
+        }
       }
 
       function loadFiles(files){
@@ -175,13 +182,15 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
       }
 
       function createThumbnailApp(file){
-        if(scope["thumbApp"+file.id]===undefined){
           var app=new dwv.App();
           app.init({"containerDivId": "app-thumb-"+file.id});
           app.loadURLs([file.fileData[0]]);
-          scope["thumbApp"+file.id]=app;
-        }
+          scope.ViewerApp.thumbApps[file.id]=app;
       };
+
+      function deleteThumbApp(idFile){
+        delete scope.ViewerApp.thumbApps[idFile];
+      }
 
       dwv.i18nOnInitialised(function(){
         dwv.gui.info.overlayMaps=false;
@@ -197,6 +206,10 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
       scope.$watch('currentFile',function(data){
         if(data && !angular.equals(data,{})){
           loadFiles(scope.currentFile.fileData);
+        }else{
+          if(scope.dwvApp){
+            scope.dwvApp.reset();
+          }
         }
       });
 

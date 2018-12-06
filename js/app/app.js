@@ -34,7 +34,7 @@ Array.prototype.remove = Array.prototype.remove || function(val){
     var i = this.length; while(i--){if(this[i]===val){this.splice(i,1);}}
 };
 
-var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
+var WebsiteApp=angular.module('rxModule', ['ui.bootstrap','ng-walkthrough'])
 .controller('BaseCtrl',function($rootScope,FileSrv,EncryptSrv,$uibModal,$timeout){
 
  //[TODO] buscar una mejor forma de handlear dmw's errors -.-
@@ -117,14 +117,50 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         },
         getTimeDiff:function(start,now){return (now-start);},
 
-        tutorialMode:false,
-        startTutorial:function(){
-          WebApp.tutorialMode=true;
-          if(WebApp.arrFiles.length==0 && !WebApp.demoMode && !WebApp.disabledDemo){
-            WebApp.startDemo();
-          }
-        },
+        tutorial:{
+          active:false,
+          currentStep:0,
+          steps:[
+            {id:'selectfiles',active:false,elm:'#btn-select-files',caption:'select!'},
+            {id:'viewerapp',  active:false,elm:'#viewerapp',caption:'viewerappaaaaa!'},
+            {id:'viewerinfo', active:false,elm:'#viewerapp',caption:'viewerinfoaaaaaaaaaaaa!'},
+/*
+            'viewerapp',
+            'viewerinfo'
+            'tools',
+            'tool-scroll','tool-zoom','tool-lvls','tool-tags','tool-info','tool-fulls'
+            'column'
+            */
+          ],
+          start:function(){
+            WebApp.tutorial.active=true;
+            if(WebApp.arrFiles.length==0 && !WebApp.demoMode && !WebApp.disabledDemo){
+              WebApp.startDemo();
+            }
+            WebApp.tutorial.goToStep(0);
 
+          },
+          goToNextStep:function(){
+            WebApp.tutorial.goToStep(WebApp.tutorial.currentStep+1);
+          },
+          goToStep:function(step,current){
+            if(current!==undefined && WebApp.tutorial.steps[current]!=undefined){
+              WebApp.tutorial.steps[current].active=false;
+            }
+            if(WebApp.tutorial.steps[step]!=undefined){
+              WebApp.tutorial.currentStep=step;
+              WebApp.tutorial.steps[step].active=true;
+            }else{
+              WebApp.tutorial.end();
+            }
+
+          },
+          end:function(){ //close tutorial
+console.log('hoal');
+            WebApp.tutorial.goToStep(0);
+            WebApp.tutorial.active=false;
+          },
+        },
 //ENCRYPTION
         _keyWords:[],
         getKey:function(){return WebApp._keyWords.join(' ');},
@@ -222,7 +258,6 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
             WebApp.arrFiles=[];
           }
           WebApp.disableDemo();
-          WebApp.tutorialMode=false;
 
           if(!WebApp.currentFile){WebApp.currentFile=WebApp.uploadedFiles[0];}
           angular.forEach(WebApp.uploadedFiles,function(file){
@@ -256,9 +291,12 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
           WebApp.show.deleteFile=true;
         },
         noFiles:function(){
+          WebApp.currentFile=false;
           WebApp.show.saveBtn=false;
           WebApp.demoMode=false;
+          WebApp.demoDisabled=false;
           WebApp.show.demoBtn=true;
+//          WebApp.tutorial.end();
         }
     };
 
@@ -334,10 +372,10 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         if(isCollection){Promises.push(saveAsOneFile(selectedFiles));}
 
         Promise.all(Promises).then(function(filesList){
-console.log(filesList);
           scope.$apply(function(){
             scope.uploadedFiles=filesList;
             scope.loading=false; //hide loader
+            e.target.value = "";
           });
         });
       });

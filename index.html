@@ -42,14 +42,6 @@
                           <i class="fas fa-eye"></i> Get Link &amp; Keys
                       </button>
 
-                      <!-- files input -->
-                      <input id="input-file" type="file" multiple class="hidden"
-                             ng-file-uploader
-                             ng-change="WebApp.selectFiles(this.files)"
-                             ng-model="sFiles"
-                             uploaded-files="WebApp.uploadedFiles"
-                             loading="WebApp.show.headerLoader">
-
                       <!-- demo btn --
                        <button  ng-click="WebApp.startDemo()"
                                 ng-show="WebApp.show.demoBtn"
@@ -58,10 +50,19 @@
                        </button>
                        &nbsp;
                        <!-- /demo btn -->
+
+                      <!-- files input -->
+                      <input id="input-file" type="file" multiple class="hidden"
+                             ng-file-uploader
+                             ng-change="WebApp.selectFiles(this.files)"
+                             ng-model="sFiles"
+                             uploaded-files="WebApp.uploadedFiles"
+                             loading="WebApp.show.headerLoader">
                       <!-- select files btn -->
-                       <button onclick="document.getElementById('input-file').click()"
-                               class="btn btn-secondary btn-sm"
-                               ng-show="WebApp.show.fileinput">
+                       <button  id="btn-select-files"
+                                onclick="document.getElementById('input-file').click()"
+                                class="btn btn-secondary btn-sm"
+                                ng-show="WebApp.show.fileinput">
                            <i class="fas fa-upload"></i> Select files
                        </button>
 
@@ -83,7 +84,8 @@
 
             <div class="main-container">
               <!-- Viewer -->
-              <ng-viewer current-file="WebApp.currentFile"
+              <ng-viewer id="viewerapp"
+                          current-file="WebApp.currentFile"
                           arr-files="WebApp.arrFiles"></ng-viewer>
 
             </div>
@@ -91,6 +93,19 @@
             <!-- Modals -->
             <script type="text/ng-template" id="ModalTags.html"></script><!-- /#modal-tags -->
 
+            <!-- Tutorial Walkthrough -->
+            <div ng-repeat="step in WebApp.tutorial.steps">
+              <walkthrough
+                  wid="{{step.id}}"
+                  walkthrough-type="transparency"
+                  is-active="step.active"
+                  focus-element-selector="{{step.elm}}"
+                  main-caption="{{step.caption}}"
+                  on-walkthrough-hide="WebApp.tutorial.goToNextStep()"
+                  use-button="true"
+                  button-caption="Next">
+              </walkthrough>
+            </div>
 
         </div><!-- /#app -->
 
@@ -120,6 +135,9 @@
         <script type="text/javascript" src="js/vendor/dwv/dist/dwv.js"></script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.9/split.min.js"></script>
+
+        <script src="js/vendor/ng-walkthrough/ng-walkthrough.js"></script>
+        <link href="js/vendor/ng-walkthrough/ng-walkthrough.css" rel="stylesheet">
 
         <script src="js/app/app.js"></script>
         <script src="js/app/viewer.js"></script>
