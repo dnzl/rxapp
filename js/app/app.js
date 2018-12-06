@@ -4,6 +4,24 @@ if(!window.File || !window.FileReader || !window.FileList || !window.Blob){
 }
 if(typeof(Worker)===undefined){alert('WebWorkers not found');}
 
+// https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+if (!String.prototype.padStart){
+    String.prototype.padStart = function padStart(targetLength, padString) {
+        targetLength = targetLength >> 0; //truncate if number, or convert non-number to 0;
+        padString = String(typeof padString !== 'undefined' ? padString : ' ');
+        if (this.length >= targetLength) {
+            return String(this);
+        } else {
+            targetLength = targetLength - this.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength / padString.length); //append to original to ensure we are longer than needed
+            }
+            return padString.slice(0, targetLength) + String(this);
+        }
+    };
+}
+
 function randomString(length){
     if(!length){length=5;}
     var chars='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -42,6 +60,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
           seeKeysBtn:false,
           saveBtn:false,
           deleteFile:true,
+          demoBtn:true,
         },
         errors:{
           default:false, //show on modal
@@ -185,12 +204,37 @@ getTimeDiff:function(start,now){return (now-start);},
         },
 
         handleFiles:function(){
-            if(!WebApp.currentFile){WebApp.currentFile=WebApp.uploadedFiles[0];}
-            angular.forEach(WebApp.uploadedFiles,function(file){
-              WebApp.arrFiles.push(file);
-            });
-            WebApp.uploadedFiles=[];
-            WebApp.show.saveBtn=true;
+          if(WebApp.demoMode){
+            WebApp.currentFile=false;
+            WebApp.arrFiles=[];
+          }
+          WebApp.disableDemo();
+          if(!WebApp.currentFile){WebApp.currentFile=WebApp.uploadedFiles[0];}
+          angular.forEach(WebApp.uploadedFiles,function(file){
+            WebApp.arrFiles.push(file);
+          });
+          WebApp.uploadedFiles=[];
+          WebApp.show.saveBtn=true;
+        },
+
+        demoMode:false,
+        demo:function(){
+          WebApp.demoMode=true;
+          WebApp.show.demoBtn=false;
+          var demoData=[];
+          for(var i=1;i<16;++i){demoData.push('demo/'+i.toString().padStart(3,'0')+'.dcm');}
+          var demoFile={
+                id:"demo",
+                name:"Demo",
+                type:"",
+                fileData:demoData
+              };
+          WebApp.arrFiles.push(demoFile);
+          WebApp.currentFile=demoFile;
+        },
+        disableDemo:function(){
+          WebApp.demoMode=false;
+          WebApp.show.demoBtn=false;
         },
     };
 
@@ -199,6 +243,7 @@ getTimeDiff:function(start,now){return (now-start);},
       WebApp.show.saveBtn=false;
       WebApp.show.fileinput=false;
       WebApp.show.deleteFile=false;
+      WebApp.show.demoBtn=false;
       WebApp.loadGallery(hash[1]);
     }else{
       WebApp.generateKey();
