@@ -116,6 +116,7 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
       function openFile(file){scope.currentFile=file;}
       function deleteFile(index){
         if(ViewerApp.canDeleteFiles){scope.arrFiles.splice(index,1);}
+        if(scope.arrFiles.length==0){scope.currentFile=false;}
       }
 
       function loadFiles(files){
@@ -136,6 +137,7 @@ WebsiteApp.directive('ngViewer',function(FileSrv,$rootScope,$filter,$timeout){
           }else{
             getToolBtn('Scroll').disabled=false;
           }
+          ViewerApp.canDeleteFiles=$rootScope.WebApp.show.deleteFile;
         });
       }
 

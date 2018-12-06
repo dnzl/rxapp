@@ -111,7 +111,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         showTagsModal:function(){
             WebApp.modals.Tags=WebApp.openModal('tags.html');
         },
-getTimeDiff:function(start,now){return (now-start);},
+        getTimeDiff:function(start,now){return (now-start);},
 //ENCRYPTION
         _keyWords:[],
         getKey:function(){return WebApp._keyWords.join(' ');},
@@ -231,11 +231,18 @@ getTimeDiff:function(start,now){return (now-start);},
               };
           WebApp.arrFiles.push(demoFile);
           WebApp.currentFile=demoFile;
+          WebApp.show.deleteFile=false;
         },
         disableDemo:function(){
           WebApp.demoMode=false;
           WebApp.show.demoBtn=false;
+          WebApp.show.deleteFile=true;
         },
+        noFiles:function(){
+          WebApp.show.saveBtn=false;
+          WebApp.demoMode=false;
+          WebApp.show.demoBtn=true;
+        }
     };
 
     var hash=window.location.hash.split('='); //url.com/#key=HASH
@@ -252,6 +259,9 @@ getTimeDiff:function(start,now){return (now-start);},
     $rootScope.$watch('WebApp.uploadedFiles',function(data){ //selected files, begin encrypt
       if(data && data.length){WebApp.handleFiles();}
     });
+    $rootScope.$watch('WebApp.arrFiles',function(n,o){
+      if(n.length==0){WebApp.noFiles();}
+    },function(){});
 
     $rootScope.WebApp=WebApp;
 })
