@@ -82,6 +82,7 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         generateUrl:function(){
             WebApp.resourceUrl='#k='+WebApp.idGallery;
             WebApp.fullUrl=WebApp.baseUrl+WebApp.resourceUrl;
+            WebApp.qrCode=new QRCode("qrcode",WebApp.fullUrl);
         },
 //MODALS
         openModal:function(tpl,ctrl){
@@ -111,6 +112,16 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
         showHelpModal:function(){
             WebApp.modals.Help=WebApp.openModal('help.html');
         },
+
+        showPrintable:function(){
+            var printContents = document.getElementById("Modal_Show_Keys").innerHTML,
+                qrCode= document.getElementById("qrcode").innerHTML;
+            var popupWin = window.open('', '_blank', 'width=300,height=300');
+            popupWin.document.open();
+            popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="main.css" /></head><body onload="window.print()">' + printContents + qrCode + '</body></html>');
+            popupWin.document.close();
+        },
+
         tagsData:'',
         showTagsModal:function(){
             WebApp.modals.Tags=WebApp.openModal('tags.html');
