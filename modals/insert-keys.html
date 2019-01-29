@@ -6,16 +6,20 @@
         <div class="form-group insert-keywords wrapper">
             <input type="text" class="form-control input-passwort"
                     autocomplete="off" required
-                    ng-model="WebApp._keyWords[0]"> -
+                    ng-model="WebApp._keyWords[0]"
+                    ng-disabled="WebApp.show.decryptLoader"> -
             <input type="text" class="form-control input-passwort"
                     autocomplete="off" required
-                    ng-model="WebApp._keyWords[1]"> -
+                    ng-model="WebApp._keyWords[1]"
+                    ng-disabled="WebApp.show.decryptLoader"> -
             <input type="text" class="form-control input-passwort"
                     autocomplete="off" required
-                    ng-model="WebApp._keyWords[2]"> -
+                    ng-model="WebApp._keyWords[2]"
+                    ng-disabled="WebApp.show.decryptLoader"> -
             <input type="text" class="form-control input-passwort"
                     autocomplete="off" required
-                    ng-model="WebApp._keyWords[3]">
+                    ng-model="WebApp._keyWords[3]"
+                    ng-disabled="WebApp.show.decryptLoader">
         </div>
     </div>
     <div class="modal-footer">
