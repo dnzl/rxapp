@@ -34,7 +34,7 @@ Array.prototype.remove = Array.prototype.remove || function(val){
     var i = this.length; while(i--){if(this[i]===val){this.splice(i,1);}}
 };
 
-var WebsiteApp=angular.module('rxModule', ['ui.bootstrap','ng-walkthrough'])
+var WebsiteApp=angular.module('rxModule', ['ui.bootstrap'])
 .controller('BaseCtrl',function($rootScope,FileSrv,EncryptSrv,$uibModal,$timeout){
 
  //[TODO] buscar una mejor forma de handlear dmw's errors -.-
@@ -117,50 +117,14 @@ var WebsiteApp=angular.module('rxModule', ['ui.bootstrap','ng-walkthrough'])
         },
         getTimeDiff:function(start,now){return (now-start);},
 
-        tutorial:{
-          active:false,
-          currentStep:0,
-          steps:[
-            {id:'selectfiles',active:false,elm:'#btn-select-files',caption:'select!'},
-            {id:'viewerapp',  active:false,elm:'#viewerapp',caption:'viewerappaaaaa!'},
-            {id:'viewerinfo', active:false,elm:'#viewerapp',caption:'viewerinfoaaaaaaaaaaaa!'},
-/*
-            'viewerapp',
-            'viewerinfo'
-            'tools',
-            'tool-scroll','tool-zoom','tool-lvls','tool-tags','tool-info','tool-fulls'
-            'column'
-            */
-          ],
-          start:function(){
-            WebApp.tutorial.active=true;
-            if(WebApp.arrFiles.length==0 && !WebApp.demoMode && !WebApp.disabledDemo){
-              WebApp.startDemo();
-            }
-            WebApp.tutorial.goToStep(0);
-
-          },
-          goToNextStep:function(){
-            WebApp.tutorial.goToStep(WebApp.tutorial.currentStep+1);
-          },
-          goToStep:function(step,current){
-            if(current!==undefined && WebApp.tutorial.steps[current]!=undefined){
-              WebApp.tutorial.steps[current].active=false;
-            }
-            if(WebApp.tutorial.steps[step]!=undefined){
-              WebApp.tutorial.currentStep=step;
-              WebApp.tutorial.steps[step].active=true;
-            }else{
-              WebApp.tutorial.end();
-            }
-
-          },
-          end:function(){ //close tutorial
-console.log('hoal');
-            WebApp.tutorial.goToStep(0);
-            WebApp.tutorial.active=false;
-          },
+        tutorialMode:false,
+        startTutorial:function(){
+          WebApp.tutorialMode=true;
+          if(WebApp.arrFiles.length==0 && !WebApp.demoMode && !WebApp.disabledDemo){
+            WebApp.startDemo();
+          }
         },
+
 //ENCRYPTION
         _keyWords:[],
         getKey:function(){return WebApp._keyWords.join(' ');},
@@ -258,6 +222,7 @@ console.log('hoal');
             WebApp.arrFiles=[];
           }
           WebApp.disableDemo();
+          WebApp.tutorialMode=false;
 
           if(!WebApp.currentFile){WebApp.currentFile=WebApp.uploadedFiles[0];}
           angular.forEach(WebApp.uploadedFiles,function(file){
@@ -296,7 +261,7 @@ console.log('hoal');
           WebApp.demoMode=false;
           WebApp.demoDisabled=false;
           WebApp.show.demoBtn=true;
-//          WebApp.tutorial.end();
+          WebApp.tutorialMode=false;
         }
     };
 

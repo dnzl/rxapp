@@ -83,6 +83,7 @@ try{
     );
   }
 }catch(Exception $e){
+  header('HTTP/1.1 400 Bad Request', true, 400);
   $result=array(
     'status'=>'error',
     'msg'=>$e->getMessage(),

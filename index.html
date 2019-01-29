@@ -42,15 +42,6 @@
                           <i class="fas fa-eye"></i> Get Link &amp; Keys
                       </button>
 
-                      <!-- demo btn --
-                       <button  ng-click="WebApp.startDemo()"
-                                ng-show="WebApp.show.demoBtn"
-                                class="btn btn-info btn-sm">
-                         <i class="fas fa-eye"></i> Demo
-                       </button>
-                       &nbsp;
-                       <!-- /demo btn -->
-
                       <!-- files input -->
                       <input id="input-file" type="file" multiple class="hidden"
                              ng-file-uploader
@@ -93,18 +84,6 @@
             <!-- Modals -->
             <script type="text/ng-template" id="ModalTags.html"></script><!-- /#modal-tags -->
 
-            <!-- Tutorial Walkthrough -->
-            <div ng-repeat="step in WebApp.tutorial.steps">
-              <walkthrough
-                  wid="{{step.id}}"
-                  walkthrough-type="transparency"
-                  is-active="step.active"
-                  focus-element-selector="{{step.elm}}"
-                  main-caption="{{step.caption}}"
-                  on-walkthrough-hide="WebApp.tutorial.goToNextStep()"
-                  use-button="true"
-                  button-caption="Next">
-              </walkthrough>
             </div>
 
         </div><!-- /#app -->
@@ -135,9 +114,6 @@
         <script type="text/javascript" src="js/vendor/dwv/dist/dwv.js"></script>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.5.9/split.min.js"></script>
-
-        <script src="js/vendor/ng-walkthrough/ng-walkthrough.js"></script>
-        <link href="js/vendor/ng-walkthrough/ng-walkthrough.css" rel="stylesheet">
 
         <script src="js/app/app.js"></script>
         <script src="js/app/viewer.js"></script>
